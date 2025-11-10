@@ -12,9 +12,9 @@ import style from './Navbar.module.css'
 export default function Navbar() {
   return (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
-          <Toolbar className={style.NavList}>
+      <Box sx={{ flexGrow: 1 , zIndex: 9999}}>
+        <AppBar position="sticky" sx={{zIndex: 9999999}} >
+          <Toolbar className={style.NavList} >
             <Typography className={style.NavMenu} component={'dev'}>
             <Link component={RouterLink} to={'/'} underline='none'  color='inherit'>Home</Link>
             <Link component={RouterLink} to={'/cart'} underline='none' color='inherit'>Cart</Link>

@@ -1,0 +1,24 @@
+.RegisterContent{
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    gap: 10%;
+}
+.Registerpage{
+    text-align: center;
+    
+}
+.Textfield{
+    width: 40%;
+}
+.RegiserForm{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+
+    
+}

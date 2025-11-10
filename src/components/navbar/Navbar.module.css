@@ -2,6 +2,9 @@
     list-style: none;
     text-decoration: none;
     justify-content: space-between;
+    position: fixed;
+    z-index: 999999999999;
+
 }
 .NavMenu{
     width: 20%;
