@@ -1,39 +1,58 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import Home from "./pages/home/Home";
 import Cart from "./pages/cart/Cart";
 import Profile from "./pages/profile/Profile";
+import VerifyEmail from "./pages/verifyEmail/verifyEmail";
+import ForgotPassword from "./pages/forgotpassword/Forgotpassword";
+import ResetPassword from "./pages/forgotpassword/ResetPassword";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children:[
+              {
+        index: true, // بدل path="/" 👍
+        element: <Home />
+      },
         {
-            path: "/",
+            path: "",
             element: <Home />
         },
         {
-            path: "/home",
+            path: "home",
             element: <Home />
         },
         {
-            path: "/register",
+            path: "register",
             element:<Register />
         },
         {
-            path: "/login",
+            path: "login",
             element: <Login />
         },
         {
-            path: "/cart",
+            path: "cart",
             element: <Cart />
         },
         {
-            path :"/profile",
+            path :"profile",
             element:<Profile />
+        },
+        {
+            path:"verify-email",
+            element: <VerifyEmail />
+        },
+        {
+            path:"/forgot-password" ,
+            element:<ForgotPassword/>
+        },
+        {
+             path:"/reset-password",
+              element:<ResetPassword />
         }
     ]
   },
