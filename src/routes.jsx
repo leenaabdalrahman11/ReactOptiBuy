@@ -8,6 +8,8 @@ import Profile from "./pages/profile/Profile";
 import VerifyEmail from "./pages/verifyEmail/verifyEmail";
 import ForgotPassword from "./pages/forgotpassword/Forgotpassword";
 import ResetPassword from "./pages/forgotpassword/ResetPassword";
+import Categories from "./pages/categories/Categories";
+import CategoriesDetails from "./pages/categories/categoriesDetails";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,9 @@ const router = createBrowserRouter([
         {
              path:"/reset-password",
               element:<ResetPassword />
+        },{
+            path: "/category-details/:id",
+            element:<CategoriesDetails />
         }
     ]
   },
