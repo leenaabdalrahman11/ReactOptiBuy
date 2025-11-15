@@ -9,13 +9,14 @@ import { Virtual, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/virtual';
 import { Link } from 'react-router';
+import AxiosInstance from '../../api/AxiosInstance';
 export default function Categories() {
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState([]);
 
     const getCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/categories/active`);
+            const response = await AxiosInstance.get(`/categories/active`);
             setCategories(response.data.categories);
             console.log(response.data.categories);
         } catch (err) {

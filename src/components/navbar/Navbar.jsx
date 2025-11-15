@@ -4,12 +4,21 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import {useNavigate} from 'react-router-dom'
+
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import style from './Navbar.module.css'
-export default function Navbar() {
+export default function Navbar({isLoggedIn , setIsLoggedIn}) {
+  const navigate = useNavigate();
+  const handleLogout = ()=>{
+    localStorage.removeItem("userToken");
+    setIsLoggedIn(false);
+    navigate('/login');
+
+  }
   return (
     <>
       <Box sx={{ flexGrow: 1, zIndex: 9999 }}>
@@ -17,11 +26,12 @@ export default function Navbar() {
           <Toolbar className={style.NavList} >
             <Typography className={style.NavMenu} component={'dev'}>
               <Link component={RouterLink} to={'/'} underline='none' color='inherit'>Home</Link>
+              {isLoggedIn ? (<>
               <Link component={RouterLink} to={'/cart'} underline='none' color='inherit'>Cart</Link>
               <Link component={RouterLink} to={'/profile'} underline='none' color='inherit'>Profile</Link>
-
-
-            </Typography>
+              <Link onClick={handleLogout} component={RouterLink} underline='none' color='inherit'>Log Out</Link>
+              </>) : (
+                <>      
             <Typography className={style.NavAuth} component={'dev'}>
               <Button
                 variant="contained"
@@ -40,6 +50,12 @@ export default function Navbar() {
               </Button>
 
             </Typography>
+                </>
+              )}
+
+
+            </Typography>
+
 
           </Toolbar>
         </AppBar>

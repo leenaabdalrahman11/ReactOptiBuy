@@ -8,6 +8,7 @@ import { EffectCoverflow, Pagination } from 'swiper/modules';
 
 import 'swiper/css';
 import 'swiper/css/effect-fade';
+import AxiosInstance from '../../api/AxiosInstance';
 
 export default function CategoriesDetails() {
     const { id } = useParams();
@@ -18,7 +19,7 @@ export default function CategoriesDetails() {
 
     const getCategories = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/categories/${id}`);
+            const response = await AxiosInstance.get(`/categories/${id}`);
             setCategoryDetails(response.data.category);
             console.log(response.data.category);
         } catch (err) {
@@ -30,7 +31,7 @@ export default function CategoriesDetails() {
     }
     const getProducts = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/products/active');
+            const response = await AxiosInstance.get('/products/active');
             const filtered = response.data.products.filter(
                 (prod) => prod.CategoryId === id
             );

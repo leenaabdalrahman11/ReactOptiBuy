@@ -10,6 +10,7 @@ import ForgotPassword from "./pages/forgotpassword/Forgotpassword";
 import ResetPassword from "./pages/forgotpassword/ResetPassword";
 import Categories from "./pages/categories/Categories";
 import CategoriesDetails from "./pages/categories/categoriesDetails";
+import ProtectdRouter from "./components/Protected/ProtectdRouter";
 
 const router = createBrowserRouter([
   {
@@ -17,16 +18,18 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children:[
               {
-        index: true, // بدل path="/" 👍
-        element: <Home />
+        index: true,
+        element:             
+        <ProtectdRouter>
+            <Home />
+            </ProtectdRouter>
       },
         {
-            path: "",
-            element: <Home />
-        },
-        {
-            path: "home",
-            element: <Home />
+            path: "home",    
+            element:           
+            <ProtectdRouter>
+            <Home />
+            </ProtectdRouter>
         },
         {
             path: "register",
