@@ -1,127 +1,128 @@
+import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { Link, useParams } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { EffectFade } from 'swiper/modules';
 import { EffectCoverflow, Pagination } from 'swiper/modules';
-
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import AxiosInstance from '../../api/AxiosInstance';
+import { useQuery } from '@tanstack/react-query';
 
 export default function CategoriesDetails() {
-    const { id } = useParams();
-    console.log(id);
-    const [categoryDetails, setCategoryDetails] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [isLoading, setIsLoading] = useState([]);
+  const { id } = useParams();
+  console.log('category id:', id);
 
-    const getCategories = async () => {
-        try {
-            const response = await AxiosInstance.get(`/categories/${id}`);
-            setCategoryDetails(response.data.category);
-            console.log(response.data.category);
-        } catch (err) {
-            console.log(err);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }
-    const getProducts = async () => {
-        try {
-            const response = await AxiosInstance.get('/products/active');
-            const filtered = response.data.products.filter(
-                (prod) => prod.CategoryId === id
-            );
-            setProducts(filtered);
-            console.log(filtered);
-        } catch (err) {
-            console.log(err);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }
-    useEffect(() => {
-        getCategories();
-        getProducts();
-    }, [id]);
-    if (isLoading) {
-        return (
-            <CircularProgress />
-        )
-    }
-    return (
-        <>
-            <Box textAlign="center">
-                <Typography component={'h1'} variant='h3'>
-                    {`welcome to ${categoryDetails?.name || ''}`}
-                </Typography>
-                <Typography component={'p'} variant='p'>
-                    {`Take a look at our awesome collection in the ${categoryDetails.name} 
-              stylesh , trendy , and made just for you !
-           `}
+  // 1) Fetch category details
+  const fetchCategoryDetails = async () => {
+    const response = await AxiosInstance.get(`/categories/${id}`);
+    // بافترض الـ API برجع شيء زي: { category: { ... } }
+    return response.data;
+  };
 
-                </Typography>
+  // 2) Fetch products for this category
+  const fetchProductsByCategory = async () => {
+    const response = await AxiosInstance.get('/products/active');
+    const filtered = response.data.products.filter(
+      (prod) => prod.CategoryId === id
+    );
+    return filtered;
+  };
 
+  const {
+    data: categoryData,
+    isLoading: isCategoryLoading,
+    isError: isCategoryError,
+    error: categoryError,
+  } = useQuery({
+    queryKey: ['categoryDetails', id],
+    queryFn: fetchCategoryDetails,
+    staleTime: 1000 * 60 * 5,
+  });
 
-                <Swiper
-                    effect="coverflow"
-                    grabCursor
-                    centeredSlides
-                    slidesPerView="auto"
-                    coverflowEffect={{
-                        rotate: 50,
-                        stretch: 0,
-                        depth: 100,
-                        modifier: 1,
-                        slideShadows: true,
-                    }}
-                    pagination
-                    modules={[EffectCoverflow, Pagination]}
-                    className="mySwiper"
-                    style={{ padding: '20px 0' }}
-                    breakpoints={{
-                        0: { spaceBetween: 8 },
-                        600: { spaceBetween: 12 },
-                        900: { spaceBetween: 16 },
-                        1200: { spaceBetween: 24 },
-                    }}
-                >
-                    
-                    {products.map((prod) => (
-                        <Link to={'/hom'}>
-                        <SwiperSlide
-                            key={prod._id}
-                            style={{ width: 'min(85vw, 280px)' }}   
-                        >
-                            <img
-                                src={prod?.mainImage?.secure_url || ''}
-                                alt={prod.name}
-                                style={{
-                                    display: 'block',
-                                    width: '100%',
-                                    height: 'clamp(220px, 40vw, 360px)', 
-                                    objectFit: 'cover',
-                                    borderRadius: 12,
-                                }}
-                            />
-                            <div>
-                                <h3 style={{ marginTop: 8, fontSize: 'clamp(14px, 2.5vw, 18px)' }}>
-                                    {prod.name}
-                                </h3>
-                            </div>
-                        </SwiperSlide>                        
-                        </Link>
+  const {
+    data: products = [],
+    isLoading: isProductsLoading,
+    isError: isProductsError,
+    error: productsError,
+  } = useQuery({
+    queryKey: ['productsByCategory', id],
+    queryFn: fetchProductsByCategory,
+    staleTime: 1000 * 60 * 5,
+  });
 
-                    ))}
-                </Swiper>
+  if (isCategoryLoading || isProductsLoading) {
+    return <CircularProgress />;
+  }
 
-            </Box>
+  if (isCategoryError) {
+    return <p>Error: {categoryError?.message || 'Failed to load category.'}</p>;
+  }
 
+  if (isProductsError) {
+    return <p>Error: {productsError?.message || 'Failed to load products.'}</p>;
+  }
 
-        </>
-    )
+  const categoryName = categoryData?.category?.name || 'Category';
+
+  return (
+    <Box textAlign="center" py={3}>
+      <Typography component="h1" variant="h3" gutterBottom>
+        {`Welcome to ${categoryName}`}
+      </Typography>
+
+      <Typography component="p" variant="body1" sx={{ maxWidth: 600, mx: 'auto', mb: 3 }}>
+        {`Take a look at our awesome collection in the ${categoryName} – stylish, trendy, and made just for you!`}
+      </Typography>
+
+      <Swiper
+        effect="coverflow"
+        grabCursor
+        centeredSlides
+        slidesPerView="auto"
+        coverflowEffect={{
+          rotate: 50,
+          stretch: 0,
+          depth: 100,
+          modifier: 1,
+          slideShadows: true,
+        }}
+        pagination
+        modules={[EffectCoverflow, Pagination]}
+        className="mySwiper"
+        style={{ padding: '20px 0' }}
+        breakpoints={{
+          0: { spaceBetween: 8 },
+          600: { spaceBetween: 12 },
+          900: { spaceBetween: 16 },
+          1200: { spaceBetween: 24 },
+        }}
+      >
+        {products.map((prod) => (
+          <SwiperSlide
+            key={prod._id}
+            style={{ width: 'min(85vw, 280px)' }}
+          >
+            <Link to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <img
+                src={prod?.mainImage?.secure_url || ''}
+                alt={prod.name}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  height: 'clamp(220px, 40vw, 360px)',
+                  objectFit: 'cover',
+                  borderRadius: 12,
+                }}
+              />
+              <div>
+                <h3 style={{ marginTop: 8, fontSize: 'clamp(14px, 2.5vw, 18px)' }}>
+                  {prod.name}
+                </h3>
+              </div>
+            </Link>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </Box>
+  );
 }
