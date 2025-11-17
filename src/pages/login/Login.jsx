@@ -26,8 +26,6 @@ export default function Login() {
                 password: data.password,
             };
             const res = await axios.post('http://localhost:3000/auth/login', payload);
-            console.log( res.data);
-
             if (res.status == 200) {
                 localStorage.setItem("userToken",res.data.token);
                 navigate('/home');
