@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup'
 import RegisterSchema from '../../validation/RegisterSchema'
 import { useNavigate } from 'react-router-dom';
+import AxiosInstance from '../../api/AxiosInstance';
 export default function Register() {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(RegisterSchema)
@@ -26,7 +27,7 @@ export default function Register() {
                 password: data.password,
                 confirmpassword: data.confirmpassword,
             };
-            const res = await axios.post('http://localhost:3000/auth/register', payload);
+            const res = await AxiosInstance.post('/auth/register', payload);
             console.log(res.data);
             if (res.status >= 200 && res.status < 300) {
                      navigate('/verify-email', { replace: true });

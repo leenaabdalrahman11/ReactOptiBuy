@@ -6,15 +6,18 @@ import axios from 'axios';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup'
 import LoginSchema from '../../validation/LoginSchema'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import AxiosInstance from '../../api/AxiosInstance';
 
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(LoginSchema)
     });
+
     const navigate = useNavigate();
+    const {setIsLoggedIn} = useOutletContext();
     const [isLoading, setIsLoading] = useState(false);
     const onSubmit = async (data) => {
         console.log('RHF data:', data);
@@ -25,7 +28,10 @@ export default function Login() {
                 email: data.email,
                 password: data.password,
             };
-            const res = await axios.post('http://localhost:3000/auth/login', payload);
+
+            const res = await AxiosInstance.post('/auth/login', payload);
+            localStorage.setItem("userToken", res.data.token);
+
             if (res.status == 200) {
                 localStorage.setItem("userToken",res.data.token);
                 navigate('/home');

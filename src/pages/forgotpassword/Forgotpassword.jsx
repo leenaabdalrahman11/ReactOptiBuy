@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../../api/AxiosInstance";
 
 export default function ForgotPassword() {
   const { register, handleSubmit } = useForm();
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
   const onSubmit = async (data) => {
     setMsg("");
     try {
-      const res = await axios.post("http://localhost:3000/auth/sendCode", data);
+      const res = await AxiosInstance.post("/auth/sendCode", data);
       setMsg(res.data.message);
       navigate('/reset-password');
     } catch (err) {
