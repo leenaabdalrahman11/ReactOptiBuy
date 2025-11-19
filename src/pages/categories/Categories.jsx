@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import ButtonBase from '@mui/material/ButtonBase';
+import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Virtual, Autoplay } from 'swiper/modules';
 // Import Swiper styles
@@ -11,7 +12,20 @@ import 'swiper/css/virtual';
 import { Link } from 'react-router';
 import AxiosInstance from '../../api/AxiosInstance';
 export default function Categories() {
-    const [categories, setCategories] = useState([]);
+        const [categories, setCategories] = useState([]);
+     const fetchCategories = async ()=>{
+        const response = await AxiosInstance.get("categories/active");
+        return response;
+    }
+    const {data,isLoading,isError,error} = useQuery({
+        queryKey:['categories'],
+        queryFn:fetchCategories,
+        staleTime:1000 * 60 * 5
+    })
+    if(isError) return <p>error is {error.message}</p>
+    if(isLoading) return <CircularProgress />
+    console.log(data);
+    /*const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState([]);
 
     const getCategories = async () => {
@@ -34,7 +48,7 @@ export default function Categories() {
         return (
             <CircularProgress />
         )
-    }
+    }*/
     return (
         <Box py={2} textAlign="center">
             <Typography variant='h5' component={'h2'}>
@@ -55,7 +69,7 @@ export default function Categories() {
                     }}
                     style={{ padding: "10px 0" }}
                 >
-                    {categories.map((cat, index) => (
+                    {data.data.categories.map((cat, index) => (
                         <SwiperSlide key={cat._id} virtualIndex={index}>
                             <Card sx={{ p: 2, textAlign: 'center' }} elevation={0}>
                                 <Link to={`/category-details/${cat._id}`} >
