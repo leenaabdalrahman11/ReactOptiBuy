@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import ButtonBase from '@mui/material/ButtonBase';
+import { useQuery } from '@tanstack/react-query';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Virtual, Autoplay } from 'swiper/modules';
 // Import Swiper styles
@@ -10,8 +11,8 @@ import 'swiper/css';
 import 'swiper/css/virtual';
 import { Link } from 'react-router';
 import AxiosInstance from '../../api/AxiosInstance';
-import { useQuery } from '@tanstack/react-query';
 export default function Categories() {
+        const [categories, setCategories] = useState([]);
      const fetchCategories = async ()=>{
         const response = await AxiosInstance.get("categories/active");
         return response;
@@ -24,12 +25,12 @@ export default function Categories() {
     if(isError) return <p>error is {error.message}</p>
     if(isLoading) return <CircularProgress />
     console.log(data);
-    /*   const [categories, setCategories] = useState([]);
+    /*const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState([]);
 
     const getCategories = async () => {
         try {
-            const response = await AxiosInstance (`categories/active`);
+            const response = await AxiosInstance.get(`/categories/active`);
             setCategories(response.data.categories);
             console.log(response.data.categories);
         } catch (err) {

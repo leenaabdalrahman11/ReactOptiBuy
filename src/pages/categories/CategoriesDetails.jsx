@@ -15,7 +15,6 @@ export default function CategoriesDetails() {
   // 1) Fetch category details
   const fetchCategoryDetails = async () => {
     const response = await AxiosInstance.get(`/categories/${id}`);
-    // بافترض الـ API برجع شيء زي: { category: { ... } }
     return response.data;
   };
 
