@@ -1,17 +1,18 @@
-import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router'
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade } from 'swiper/modules';
 import { EffectCoverflow, Pagination } from 'swiper/modules';
+
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import AxiosInstance from '../../api/AxiosInstance';
-import { useQuery } from '@tanstack/react-query';
 
 export default function CategoriesDetails() {
-  const { id } = useParams();
+   const { id } = useParams();
   console.log('category id:', id);
-
   // 1) Fetch category details
   const fetchCategoryDetails = async () => {
     const response = await AxiosInstance.get(`/categories/${id}`);
@@ -26,7 +27,6 @@ export default function CategoriesDetails() {
     );
     return filtered;
   };
-
   const {
     data: categoryData,
     isLoading: isCategoryLoading,
@@ -37,7 +37,6 @@ export default function CategoriesDetails() {
     queryFn: fetchCategoryDetails,
     staleTime: 1000 * 60 * 5,
   });
-
   const {
     data: products = [],
     isLoading: isProductsLoading,
@@ -48,31 +47,24 @@ export default function CategoriesDetails() {
     queryFn: fetchProductsByCategory,
     staleTime: 1000 * 60 * 5,
   });
-
   if (isCategoryLoading || isProductsLoading) {
     return <CircularProgress />;
   }
-
   if (isCategoryError) {
     return <p>Error: {categoryError?.message || 'Failed to load category.'}</p>;
   }
-
   if (isProductsError) {
     return <p>Error: {productsError?.message || 'Failed to load products.'}</p>;
   }
-
   const categoryName = categoryData?.category?.name || 'Category';
-
   return (
     <Box textAlign="center" py={3}>
       <Typography component="h1" variant="h3" gutterBottom>
         {`Welcome to ${categoryName}`}
       </Typography>
-
       <Typography component="p" variant="body1" sx={{ maxWidth: 600, mx: 'auto', mb: 3 }}>
         {`Take a look at our awesome collection in the ${categoryName} – stylish, trendy, and made just for you!`}
       </Typography>
-
       <Swiper
         effect="coverflow"
         grabCursor
