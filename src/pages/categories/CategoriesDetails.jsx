@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade } from 'swiper/modules';
 import { EffectCoverflow, Pagination } from 'swiper/modules';
+import { useQuery } from '@tanstack/react-query';
 
 import 'swiper/css';
 import 'swiper/css/effect-fade';
