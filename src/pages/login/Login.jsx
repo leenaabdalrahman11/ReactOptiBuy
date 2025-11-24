@@ -15,7 +15,6 @@ export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(LoginSchema)
     });
-
     const navigate = useNavigate();
     const {setIsLoggedIn} = useOutletContext();
     const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +30,7 @@ export default function Login() {
             const res = await AxiosInstance.post('/auth/login', payload);
             console.log("reeeeeeeee", res.data);
             localStorage.setItem("userToken", res.data.token);
-
+            setIsLoggedIn(true); 
             if (res.status == 200) {
                 navigate('/home');
             }

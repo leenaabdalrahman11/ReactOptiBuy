@@ -11,6 +11,7 @@ import ResetPassword from "./pages/forgotpassword/ResetPassword";
 import Categories from "./pages/categories/Categories";
 import CategoriesDetails from "./pages/categories/categoriesDetails";
 import ProtectdRouter from "./components/Protected/ProtectdRouter";
+import ProductsDetails from "./pages/productsDetails/ProductsDetails";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
         },{
             path: "/category-details/:id",
             element:<CategoriesDetails />
+        },
+        {
+            path: "/product-details/:id",
+            element:<ProductsDetails />
         }
     ]
   },

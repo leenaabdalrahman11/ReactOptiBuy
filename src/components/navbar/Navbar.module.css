@@ -3,6 +3,8 @@
     text-decoration: none;
     justify-content: space-between;
     position: fixed;
+    background-color: #928b80;
+
     z-index: 999999999999;
 
 }

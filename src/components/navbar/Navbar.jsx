@@ -22,7 +22,7 @@ export default function Navbar({isLoggedIn , setIsLoggedIn}) {
   return (
     <>
       <Box sx={{ flexGrow: 1, zIndex: 9999 }}>
-        <AppBar position="sticky" sx={{ zIndex: 9999999 }} >
+        <AppBar position="sticky" sx={{ zIndex: 9999999 }}  className={style.NavBar}>
           <Toolbar className={style.NavList} >
             <Typography className={style.NavMenu} component={'dev'}>
               <Link component={RouterLink} to={'/'} underline='none' color='inherit'>Home</Link>
