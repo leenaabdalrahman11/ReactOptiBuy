@@ -14,7 +14,7 @@ export default function ResetPassword() {
     try {
       const res = await AxiosInstance.patch("/auth/resetPassword", data);
       setMsg(res.data.message);
-      navigate('/login');
+      navigate("/login");
     } catch (err) {
       setMsg(err.response?.data?.message || "Something went wrong");
     }
@@ -24,11 +24,22 @@ export default function ResetPassword() {
     <Container maxWidth="sm" sx={{ mt: 5 }}>
       {msg && <Alert sx={{ mb: 2 }}>{msg}</Alert>}
 
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: "grid", gap: 2 }}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{ display: "grid", gap: 2 }}
+      >
         <TextField label="Email" {...register("email")} required />
         <TextField label="Code" {...register("code")} required />
-        <TextField label="New Password" type="password" {...register("newPassword")} required />
-        <Button variant="contained" type="submit">Reset Password</Button>
+        <TextField
+          label="New Password"
+          type="password"
+          {...register("newPassword")}
+          required
+        />
+        <Button variant="contained" type="submit">
+          Reset Password
+        </Button>
       </Box>
     </Container>
   );

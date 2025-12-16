@@ -1,0 +1,5 @@
+.HeaderImage{
+    background-image: url(./HomeImage.png);
+    background-size: cover;
+    height: 35vh;
+}

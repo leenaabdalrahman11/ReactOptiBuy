@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import AxiosInstance from "../../api/AxiosInstance";
+import AxiosInstance from "../../api/AxiosInstance.jsx";
+import { AddToCart as addToCartService } from "../cart/AddToCart.jsx";
 
 import {
   Card,
@@ -11,18 +12,19 @@ import {
   Typography,
   IconButton,
   Box,
+  Button,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
+
+import styles from "./ProductCard.module.css";
 
 function ProductCard({ product }) {
   const productId = product._id || product.id;
 
   const fetchReviews = async () => {
-    const { data } = await AxiosInstance.get(
-      `/products/${productId}/reviews`
-    );
-    return data.reviews; 
+    const { data } = await AxiosInstance.get(`/products/${productId}/reviews`);
+    return data.reviews;
   };
 
   const {
@@ -32,69 +34,28 @@ function ProductCard({ product }) {
   } = useQuery({
     queryKey: ["reviews", productId],
     queryFn: fetchReviews,
+    staleTime: 1000 * 60 * 5,
   });
 
-  const avgRating =
-    reviews && reviews.length
-      ? (
-          reviews.reduce((sum, r) => sum + (r.rating || 0), 0) /
-          reviews.length
-        ).toFixed(1)
-      : null;
-
+  const avgRating = reviews.length
+    ? (
+        reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+      ).toFixed(1)
+    : null;
+  const addToCartHandler = () => {
+    addToCartService(product);
+  };
   return (
-    <Card
-      sx={{
-        backgroundColor: "#928b80",
-        
-        borderRadius: 8,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-        transition: "0.3s",
-        "&:hover": {
-          boxShadow: 6,
-          transform: "translateY(-4px)",
-        },
-      }}
-    >
-      <Link to={`/product-details/${product._id || product.id}`}>
+    <Card className={styles.card}>
+      <Link to={`/product-details/${productId}`}>
         <CardHeader
           title={
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              gap={1}
-            >
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  fontSize: {
-                    xs: "0.95rem",
-                    sm: "1.1rem",
-                    md: "1.25rem",
-                  },
-                }}
-                variant="body1"
-              >
+            <Box className={styles.headerTitleBox}>
+              <Typography variant="body1" className={styles.productName}>
                 {product.name}
               </Typography>
-
               {product.discount > 0 && (
-                <Box
-                  sx={{
-                    backgroundColor: "rgba(255,0,0,0.9)",
-                    color: "#fff",
-                    fontSize: "0.5rem",
-                    fontWeight: "bold",
-                    px: 1,
-                    py: "2px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  -{product.discount}%
-                </Box>
+                <Box className={styles.discountBadge}>-{product.discount}%</Box>
               )}
             </Box>
           }
@@ -105,7 +66,6 @@ function ProductCard({ product }) {
             </IconButton>
           }
         />
-
         <CardMedia
           component="img"
           height="194"
@@ -115,25 +75,15 @@ function ProductCard({ product }) {
       </Link>
 
       <CardContent>
-        <CardActions
-          disableSpacing
-          sx={{ justifyContent: "space-between", alignItems: "center" }}
-        >
+        <CardActions disableSpacing className={styles.cardActions}>
           <Typography variant="body2" color="text.secondary">
-            <span
-              style={{
-                textDecoration: "line-through",
-                marginRight: 8,
-              }}
-            >
-              ${product.price}
-            </span>
-            <span style={{ fontWeight: 700, marginRight: 8 }}>
+            <span className={styles.oldPrice}>${product.price}</span>
+            <span className={styles.newPrice}>
               ${product.priceAfterDiscount}
             </span>
           </Typography>
 
-          <Box sx={{ textAlign: "right" }}>
+          <Box className={styles.reviewsBox}>
             {isReviewsLoading && (
               <Typography variant="caption">Loading reviews...</Typography>
             )}
@@ -143,28 +93,30 @@ function ProductCard({ product }) {
               </Typography>
             )}
             {!isReviewsLoading && !isReviewsError && (
-<>
-  {avgRating ? (
-    <Typography variant="caption">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <span
-          key={star}
-          style={{
-            color: star <= avgRating ? "#FFD700" : "#ccc",
-            fontSize: "1rem",
-            marginRight: "2px",
-          }}
-        >
-          ★
-        </span>
-      ))}
-      <span style={{ marginLeft: "4px" }}>({avgRating})</span>
-    </Typography>
-  ) : (
-    <Typography variant="caption">No reviews yet</Typography>
-  )}
-</>
+              <>
+                {avgRating ? (
+                  <Typography variant="caption">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`${styles.ratingStar} ${
+                          star <= avgRating
+                            ? styles.ratingStarFilled
+                            : styles.ratingStarEmpty
+                        }`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                    <span className={styles.avgRatingValue}>({avgRating})</span>
+                  </Typography>
+                ) : (
+                  <Typography variant="caption">No reviews yet</Typography>
+                )}
+              </>
             )}
+
+            <Button onClick={() => addToCartHandler(product)}>🛒</Button>
           </Box>
         </CardActions>
       </CardContent>

@@ -1,0 +1,95 @@
+.card {
+  background-color: #844f70 !important;
+  border-radius: 15px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+}
+
+.headerTitleBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.productName {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 600px) {
+  .productName {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .productName {
+    font-size: 1.25rem;
+  }
+}
+
+.discountBadge {
+  background-color: rgba(255, 0, 0, 0.9);
+  color: #fff;
+  font-size: 0.5rem;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  margin-right: 8px;
+}
+
+.newPrice {
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.reviewsBox {
+  text-align: right;
+}
+
+.ratingStar {
+  font-size: 1rem;
+  margin-right: 2px;
+}
+
+.ratingStarFilled {
+  color: #ffd700;
+}
+
+.ratingStarEmpty {
+  color: #ccc;
+}
+
+.avgRatingValue {
+  margin-left: 4px;
+}
+
+.cartButton {
+  border-radius: 10px;
+  min-width: 45px;
+  font-size: 20px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.cartButton:hover {
+  background: #844f70;
+  transform: scale(1.05);
+}

@@ -1,0 +1,40 @@
+/*.rootBox {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.description {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 24px;
+}
+
+.productsSwiper {
+  padding: 20px 0;
+}
+
+.productSlide {
+  width: min(85vw, 280px);
+}
+
+.productLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.productImage {
+  display: block;
+  width: 100%;
+  height: clamp(220px, 40vw, 360px);
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.productTitle {
+  margin-top: 8px;
+  font-size: clamp(14px, 2.5vw, 18px);
+}
+*/

@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as yup from "yup";
 
 const RegisterSchema = yup.object({
   userName: yup

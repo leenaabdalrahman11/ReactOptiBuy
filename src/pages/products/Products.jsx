@@ -10,6 +10,7 @@ import AxiosInstance from "../../api/AxiosInstance";
 import { EffectCoverflow, Pagination } from "swiper/modules";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import ProductCard from "./ProductCard";
+import styles from "./Products.module.css";
 
 export default function Products() {
   const fetchProducts = async () => {
@@ -28,53 +29,61 @@ export default function Products() {
   if (isError) return <p>error is {error.message}</p>;
 
   const products = data?.products || [];
+  const count = products.length;
 
   return (
-    <Box py={1} textAlign="center">
-      <Typography
-        variant="h5"
-        component={"h2"}
-        sx={{
-          fontSize: {
-            xs: "0.95rem",
-            sm: "1.1rem",
-            md: "1.10rem",
-          },
-        }}
-      >
+    <Box className={styles.wrapper}>
+      <Typography variant="h5" component={"h2"} className={styles.title}>
         Products
       </Typography>
 
-      <Box>
-        <Swiper
-          effect="coverflow"
-          grabCursor
-          loop={true}
-          slidesPerView="auto"
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
-            slideShadows: false,
-          }}
-          pagination
-          modules={[EffectCoverflow, Pagination]}
-          className="mySwiper"
-          style={{ padding: "20px 0", paddingBottom: "40px" }}
-          breakpoints={{
-            0: { spaceBetween: 8 },
-            600: { spaceBetween: 12 },
-            900: { spaceBetween: 16, slidesPerView: 3 },
-            1200: { spaceBetween: 24, slidesPerView: 3 },
-          }}
-        >
-          {products.map((product) => (
-            <SwiperSlide key={product._id || product.id}>
-              <ProductCard product={product} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      <Box className={styles.swiperContainer}>
+        {count < 4 ? (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: "center",
+
+              flexWrap: "wrap",
+            }}
+          >
+            {products.map((product) => (
+              <Box key={product._id || product.id} sx={{ maxWidth: 300 }}>
+                <ProductCard product={product} />
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Swiper
+            effect="coverflow"
+            grabCursor
+            loop={count > 3}
+            slideToClickedSlide={count > 3}
+            coverflowEffect={{
+              rotate: 50,
+              stretch: 0,
+              depth: 100,
+              modifier: 1,
+              slideShadows: false,
+            }}
+            pagination
+            modules={[EffectCoverflow, Pagination]}
+            className={`mySwiper ${styles.productsSwiper}`}
+            breakpoints={{
+              0: { spaceBetween: 8 },
+              600: { spaceBetween: 12 },
+              900: { spaceBetween: 12, slidesPerView: 3 },
+              1200: { spaceBetween: 24, slidesPerView: 3 },
+            }}
+          >
+            {products.map((product) => (
+              <SwiperSlide key={product._id || product.id}>
+                <ProductCard product={product} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </Box>
     </Box>
   );

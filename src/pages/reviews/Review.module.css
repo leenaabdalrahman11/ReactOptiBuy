@@ -1,0 +1,28 @@
+.mySwiper {
+  height: 100%;
+}
+
+.mySwiper .card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.mySwiper .swiper-pagination {
+  top: auto !important;
+  bottom: 8px !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mySwiper .swiper-pagination-bullet {
+  margin: 0 4px !important;
+}

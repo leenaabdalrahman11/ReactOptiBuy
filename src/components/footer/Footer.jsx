@@ -1,5 +1,5 @@
-import { Box, Typography } from '@mui/material'
-import React from 'react'
+import { Box, Typography } from "@mui/material";
+import React from "react";
 
 export default function Footer() {
   return (
@@ -24,5 +24,5 @@ export default function Footer() {
         Built with ❤️ by Leena
       </Typography>
     </Box>
-  )
+  );
 }

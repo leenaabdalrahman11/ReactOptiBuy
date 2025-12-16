@@ -1,21 +1,40 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import AxiosInstance from "../../api/AxiosInstance";
-import { Link, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import AxiosUserInstance from "../../api/AxiosUserInstance";
+import { useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { Box, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CircularProgress,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Pagination } from "swiper/modules";
+import { EffectCreative } from "swiper/modules";
+import { Mousewheel, Autoplay } from "swiper/modules";
+import style from "../reviews/Review.module.css";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 
+import styles from "./ProductsDetails.module.css";
+
 export default function ProductsDetails() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
+
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
+  const [formError, setFormError] = useState("");
+
   const fetchReviews = async () => {
     const { data } = await AxiosInstance.get(`/products/${id}/reviews`);
-    return data.reviews;
+    return data.reviews || [];
   };
 
   const {
@@ -27,16 +46,15 @@ export default function ProductsDetails() {
     queryFn: fetchReviews,
   });
 
-  const avgRating =
-    reviews && reviews.length
-      ? (
-          reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
-        ).toFixed(1)
-      : null;
+  const avgRating = useMemo(() => {
+    if (!reviews?.length) return null;
+    const avg =
+      reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+    return avg.toFixed(1);
+  }, [reviews]);
 
   const fetchProductDetails = async () => {
     const { data } = await AxiosInstance.get(`products/${id}`);
-    console.log(data);
     return data.products;
   };
 
@@ -50,136 +68,182 @@ export default function ProductsDetails() {
     queryFn: fetchProductDetails,
     staleTime: 1000 * 60 * 5,
   });
+
+  const addReviewMutation = useMutation({
+    mutationFn: async (payload) => {
+      const { data } = await AxiosUserInstance.post(
+        `/products/${id}/reviews`,
+        payload
+      );
+      return data;
+    },
+    onSuccess: () => {
+      setComment("");
+      setRating(5);
+      setFormError("");
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+    },
+    onError: (err) => {
+      const msg =
+        err?.response?.data?.message || err?.message || "Failed to add review";
+      setFormError(msg);
+    },
+  });
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+
+    if (!comment.trim()) {
+      setFormError("Please write a comment.");
+      return;
+    }
+    if (rating < 1 || rating > 5) {
+      setFormError("Rating must be between 1 and 5.");
+      return;
+    }
+
+    addReviewMutation.mutate({ comment: comment.trim(), rating });
+  };
+
   if (isLoading) return <CircularProgress />;
   if (isError) return <p>Error: {error.message}</p>;
 
-  return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-around"
-      alignItems="center"
-      py={3}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          width: 0.5,
-          justifyContent: "space-around",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          component="h1"
-          variant="h3"
-          gutterBottom
-          sx={{
-            display: "flex",
-            width: 0.5,
-            justifyContent: "space-around",
-            alignContent: "space-around",
-            alignItems: "center",
-            mb: 3,
-            bgcolor: "rgba(0,0,0,0.08)",
-            borderRadius: 2,
+  const StarsInput = () => (
+    <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          onClick={() => setRating(star)}
+          style={{
+            cursor: "pointer",
+            fontSize: 20,
+            lineHeight: 1,
+            userSelect: "none",
           }}
+          className={`${styles.reviewRatingStar} ${
+            star <= rating
+              ? styles.reviewRatingStarFilled
+              : styles.reviewRatingStarEmpty
+          }`}
+          aria-label={`rate ${star}`}
         >
-          {product.name}
-          <Typography
-            variant="caption"
-            sx={{
-              backgroundColor: "#FF1744",
-              color: "#fff",
-              borderRadius: "4px",
-              px: 1,
-              py: "2px",
-              fontWeight: 700,
-              display: "inline-block",
-              mb: 0.5,
-            }}
-          >
-            -{product.discount}%
-          </Typography>
-        </Typography>
+          ★
+        </span>
+      ))}
+      <Typography variant="caption" sx={{ ml: 1, color: "text.secondary" }}>
+        {rating}/5
+      </Typography>
+    </Box>
+  );
 
-        <Typography
-          component="p"
-          variant="body1"
-          sx={{
-            maxWidth: 600,
-            mx: "auto",
-            mb: 3,
-            bgcolor: "rgba(0,0,0,0.08)",
-            p: 2,
-            borderRadius: 2,
+  return (
+    <Box display="flex" alignItems="center" className={styles.wrapper}>
+      <Box className={styles.subImages}>
+        <Swiper
+          grabCursor={true}
+          effect="creative"
+          centeredSlides={true}
+          slidesPerView={"auto"}
+          spaceBetween={20}
+          creativeEffect={{
+            prev: { shadow: false, translate: ["-20%", 0, -200] },
+            next: { shadow: false, translate: ["20%", 0, -200] },
           }}
+          modules={[EffectCreative]}
+          className={`mySwiper ${styles.productSwiper}`}
         >
-          Explore our amazing {product.name} with premium quality and great
-          design!
-        </Typography>
-        <Typography
-          component="p"
-          variant="body1"
-          sx={{ maxWidth: 600, mx: "auto" }}
-        >
-          {product.description}
-        </Typography>
+          {product?.subImages?.map((img) => (
+            <SwiperSlide
+              key={img._id || img.public_id}
+              className={styles.productSlide}
+            >
+              <img
+                src={img.secure_url}
+                alt={product.name}
+                className={styles.productImage}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </Box>
+
+      <Box className={styles.detailsContainer}>
+        <Box>
+          <Typography
+            component="h1"
+            variant="h3"
+            gutterBottom
+            className={styles.productTitle}
+          >
+            {product.name}
+            <Typography variant="caption" className={styles.discountBadge}>
+              -{product.discount}%
+            </Typography>
+          </Typography>
+        </Box>
+
+        <Box>
+          <Typography
+            component="p"
+            variant="body1"
+            className={styles.productShortDesc}
+          >
+            Explore our amazing {product.name} with premium quality and great
+            design!
+          </Typography>
+        </Box>
+
+        <Box>
+          <Typography
+            component="p"
+            variant="body1"
+            className={styles.productLongDesc}
+          >
+            {product.description}
+          </Typography>
+        </Box>
 
         {product.discount > 0 && (
-          <Box
-            textAlign="left"
-            mb={1}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Box display="flex" alignItems="center" gap={1}>
-              <Typography
-                variant="body2"
-                sx={{ textDecoration: "line-through", color: "text.secondary" }}
-              >
+          <Box className={styles.priceSection}>
+            <Box className={styles.priceRow}>
+              <Typography variant="body2" className={styles.oldPrice}>
                 ${product.price}
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              <Typography variant="h6" className={styles.newPrice}>
                 ${product.priceAfterDiscount}
               </Typography>
             </Box>
+
             {product.stock < 3 && (
               <Typography
                 variant="body2"
                 color="error"
-                sx={{ mt: 1, fontWeight: 500 }}
+                className={styles.lowStock}
               >
-                Only {product.stock} left in stock! 🔥
+                Only {product.stock} left in stock!
               </Typography>
             )}
+
             {!isReviewsLoading && !isReviewsError && (
               <>
                 {avgRating ? (
-                  <Typography variant="caption">
+                  <Typography
+                    variant="caption"
+                    className={styles.avgRatingStars}
+                  >
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
-                        style={{
-                          color: star <= avgRating ? "#FFD700" : "#ccc",
-                          fontSize: "1rem",
-                          marginRight: "2px",
-                        }}
+                        className={`${styles.ratingStar} ${
+                          star <= avgRating
+                            ? styles.ratingStarFilled
+                            : styles.ratingStarEmpty
+                        }`}
                       >
                         ★
                       </span>
                     ))}
-                    <span style={{ marginLeft: "4px" }}>({avgRating})</span>
+                    <span className={styles.avgRatingValue}>{avgRating}</span>
                   </Typography>
                 ) : (
                   <Typography variant="caption">No reviews yet</Typography>
@@ -188,56 +252,122 @@ export default function ProductsDetails() {
             )}
           </Box>
         )}
-      </Box>
-      <Box>
-        <Swiper
-          effect="coverflow"
-          grabCursor
-          centeredSlides
-          slidesPerView="auto"
-          pagination
-          modules={[EffectCoverflow, Pagination]}
-          className="mySwiper"
-          style={{ padding: "20px 0" }}
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 0,
-            depth: 100,
-            modifier: 1,
+        <Box mt={3}>
+          <Typography variant="h6" gutterBottom>
+            Add a comment
+          </Typography>
 
-            slideShadows: false,
-          }}
-          breakpoints={{
-            0: { spaceBetween: 8 },
-            600: { spaceBetween: 12 },
-            900: { spaceBetween: 16 },
-            1200: { spaceBetween: 24 },
-          }}
-        >
-          {product?.subImages?.map((img) => (
-            <SwiperSlide
-              key={img._id}
-              style={{
-                width: "min(70vw, 210px)",
-                paddingBottom: "0.5rem",
-                slideShadows: false,
-              }}
-            >
-              <img
-                src={img.secure_url}
-                alt={product.name}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  height: "clamp(250px, 30vw, 280px)",
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  slideShadows: false,
-                }}
+          {formError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formError}
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmitReview}>
+            <Box display="flex" flexDirection="column" maxWidth={400}>
+              <TextField
+                multiline
+                minRows={2}
+                size="small"
+                label="Your comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                margin="dense"
               />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+
+              <StarsInput />
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="small"
+                style={{ backgroundColor: "#844f70bf" }}
+                sx={{ mt: 1 }}
+                disabled={addReviewMutation.isPending}
+              >
+                {addReviewMutation.isPending ? "Sending..." : "Send"}
+              </Button>
+            </Box>
+          </form>
+        </Box>
+
+        {reviews.length > 0 && (
+          <Box className={styles.commentsContainer}>
+            <Typography
+              variant="h5"
+              component={"h2"}
+              className={styles.commentsTitle}
+            >
+              Comments
+            </Typography>
+
+            <Box className={styles.comments}>
+              <Swiper
+                direction="vertical"
+                slidesPerView={1}
+                spaceBetween={20}
+                mousewheel={{ forceToAxis: true, releaseOnEdges: true }}
+                autoplay={{ delay: 2500, disableOnInteraction: false }}
+                style={{ background: "transparent" }}
+                pagination={false}
+                modules={[Mousewheel, Autoplay]}
+                className={`${style.mySwiper} ${styles.reviewsSwiper}`}
+              >
+                {reviews.map((rev) => (
+                  <SwiperSlide
+                    key={rev._id || rev.id}
+                    style={{ background: "transparent" }}
+                  >
+                    <Card className={styles.reviewCard}>
+                      <Box className={styles.reviewHeader}>
+                        <Typography
+                          variant="body2"
+                          component="span"
+                          sx={{ fontWeight: 500 }}
+                        >
+                          {rev.createdBy?.userName || "Anonymous"}
+                        </Typography>
+
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "text.secondary" }}
+                        >
+                          {rev.createdAt
+                            ? new Date(rev.createdAt).toLocaleDateString()
+                            : ""}
+                        </Typography>
+                      </Box>
+
+                      <Box className={styles.reviewCommentBox}>
+                        <Typography variant="body2">{rev.comment}</Typography>
+                      </Box>
+
+                      {rev.rating && (
+                        <Box className={styles.reviewRatingRow}>
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                              key={star}
+                              className={`${styles.reviewRatingStar} ${
+                                star <= rev.rating
+                                  ? styles.reviewRatingStarFilled
+                                  : styles.reviewRatingStarEmpty
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </Box>
+                      )}
+                    </Card>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </Box>
+          </Box>
+        )}
+        <Box>
+          <Button onClick={() => addToCartHandler(product)}>Add To Cart</Button>
+        </Box>
       </Box>
     </Box>
   );

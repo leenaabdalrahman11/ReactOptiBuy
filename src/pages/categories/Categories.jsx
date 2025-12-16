@@ -14,11 +14,13 @@ import ButtonBase from "@mui/material/ButtonBase";
 import { useQuery } from "@tanstack/react-query";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Virtual, Autoplay } from "swiper/modules";
-// Import Swiper styles
 import "swiper/css";
 import "swiper/css/virtual";
 import { Link } from "react-router";
 import AxiosInstance from "../../api/AxiosInstance";
+
+import styles from "./Categories.module.css";
+
 export default function Categories() {
   const [categories, setCategories] = useState([]);
   const fetchCategories = async () => {
@@ -35,15 +37,12 @@ export default function Categories() {
   console.log(data);
 
   return (
-    <Box textAlign="center">
-      <Typography variant="h5" component={"h2"} sx={{    fontSize: {
-      xs: "0.95rem",
-      sm: "1.1rem",
-      md: "1.10rem",
-    },}}>
+    <Box className={styles.wrapper}>
+      <Typography variant="h5" component={"h2"} className={styles.title}>
         Categories
       </Typography>
-      <Box mt={2}>
+
+      <Box className={styles.swiperContainer}>
         <Swiper
           modules={[Virtual, Autoplay]}
           loop={true}
@@ -56,22 +55,17 @@ export default function Categories() {
             900: { slidesPerView: 5, spaceBetween: 18 },
             1200: { slidesPerView: 5, spaceBetween: 20 },
           }}
-          style={{ padding: "10px 0" }}
+          className={styles.categoriesSwiper}
         >
           {data.data.categories.map((cat, index) => (
             <SwiperSlide key={cat._id} virtualIndex={index}>
-              <Card
-                sx={{
-                 
-                  textAlign: "center",
-                  backgroundColor: "transparent",
-                  boxShadow: "none",
-                }}
-                elevation={0}
-              >
-                <Link to={`/category-details/${cat._id}`}>
+              <Card elevation={0} className={styles.categoryCard}>
+                <Link
+                  to={`/category-details/${cat._id}`}
+                  className={styles.categoryLink}
+                >
                   <Avatar
-                    sx={{ width: 55, height: 55, mx: "auto", mb: 1 }}
+                    className={styles.categoryAvatar}
                     alt={cat?.name || "category"}
                     src={cat?.image?.secure_url || ""}
                   />

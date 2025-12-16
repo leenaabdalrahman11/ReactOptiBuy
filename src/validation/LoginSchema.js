@@ -1,7 +1,6 @@
-import * as yup from 'yup';
+import * as yup from "yup";
 
 const LoginSchema = yup.object({
-
   email: yup
     .string()
     .required("Email is required")

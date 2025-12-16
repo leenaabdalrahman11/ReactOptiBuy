@@ -1,8 +1,11 @@
 .bg{
     background-color: red;
 }
+
 .HeaderImage{
     background-image: url(./HomeImage.png);
-    background-size: cover;
-    height: 35vh;
+    background-size:cover;
+    background-position: top;
+    width: 100%;
+    height: 15vh;
 }
