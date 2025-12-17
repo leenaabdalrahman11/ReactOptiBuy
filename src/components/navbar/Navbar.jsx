@@ -15,10 +15,9 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-
 import { Link as RouterLink } from "react-router-dom";
 import style from "./Navbar.module.css";
-
+import Search from "../search/Search.jsx";
 export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -134,6 +133,9 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
               >
                 Home
               </RouterLink>
+              
+               
+              
             </Typography>
 
             <Box sx={{ marginLeft: "auto" }}>

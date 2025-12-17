@@ -5,10 +5,14 @@ import Categories from "../categories/Categories";
 import Products from "../products/Products";
 import Review from "../reviews/Review";
 import FeaturedProducts from "../products/FeaturedProducts";
+import Search from "../../components/search/Search";
 export default function Home() {
   return (
     <>
-      <div className={style.HeaderImage}></div>
+      <div className={style.HeaderImage} >
+                    <Search />
+        
+      </div>
       <Box py={2} textAlign="center" style={{ marginTop: "16px" }}>
         <Container maxWidth="lg">
           <Categories />
