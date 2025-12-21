@@ -33,8 +33,10 @@ import AdminOrders from "./pages/dashboard/AdminOrders";
 import CreateUsers from "./pages/dashboard/CreateUsers";
 import EditUser from "./pages/dashboard/EditUser";
 import FeaturedProducts from "./pages/products/FeaturedProducts.jsx";
+import subCategories from "./pages/subCategories/subCategories.jsx";
 import DashboardHomeTag from "./pages/dashboard/DashboardHomeTag.jsx";
 import UserOrder from "./pages/order/UserOreder.jsx";
+import SubCategories from "./pages/subCategories/subCategories.jsx";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +78,7 @@ const router = createBrowserRouter([
       { path: "reset-password", element: <ResetPassword /> },
       { path: "categories", element: <Categories /> },
       { path: "category-details/:id", element: <CategoriesDetails /> },
+      { path: "subcategory-details/:id", element: <SubCategories /> },
       { path: "product-details/:id", element: <ProductsDetails /> },
     ],
   },
