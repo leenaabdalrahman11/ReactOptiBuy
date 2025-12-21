@@ -1,0 +1,12 @@
+.mySwiper {
+  padding: 24px 0;
+}
+
+.slide {
+  display: flex;
+  justify-content: center;
+}
+
+.centered :global(.swiper-wrapper) {
+  justify-content: center !important;
+}

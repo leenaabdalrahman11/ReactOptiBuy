@@ -116,7 +116,7 @@ export default function CategoriesDetails() {
             <SwiperSlide key={cat._id} virtualIndex={index}>
               <Card elevation={0} className={styles.categoryCard}>
                 <Link
-                  to={`/category-details/${cat._id}`}
+                  to={`/subcategory-details/${cat._id}`}
                   className={styles.categoryLink}
                 >
                   <Avatar
