@@ -37,6 +37,10 @@ import subCategories from "./pages/subCategories/subCategories.jsx";
 import DashboardHomeTag from "./pages/dashboard/DashboardHomeTag.jsx";
 import UserOrder from "./pages/order/UserOreder.jsx";
 import SubCategories from "./pages/subCategories/subCategories.jsx";
+import EditPromoSection from "./pages/dashboard/EditPromoSection.jsx";
+import ProductsPage from "./pages/products/ProductsPage.jsx";
+import EditExperienceHighlight from "./pages/dashboard/EditExperienceHighlight.jsx";
+import CreateCoupon from "./pages/dashboard/CreateCoupon.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +52,7 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "login", element: <Login /> },
       { path: "cart", element: <Cart /> },
+      { path:"products-page", element:<ProductsPage/>},
 
       {
         path: "profile",
@@ -156,6 +161,28 @@ const router = createBrowserRouter([
           </ProtectdRouter>
         ),
       },
+      {
+        path: "promo-section/:key",
+        element: (
+          <ProtectdRouter>
+            <EditPromoSection />
+          </ProtectdRouter>
+        ),
+      },{
+        path:"home-section",
+        element:(
+          <ProtectdRouter>
+            <EditExperienceHighlight />
+          </ProtectdRouter>
+        )
+      },{
+        path:"coupons",
+                element:(
+          <ProtectdRouter>
+            <CreateCoupon />
+          </ProtectdRouter>
+        )
+      }
     ],
   },
 ]);

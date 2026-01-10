@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Divider,
 } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -42,6 +43,22 @@ export default function Order() {
   const userToken = localStorage.getItem("userToken");
   const sessionId = localStorage.getItem("sessionId") || getSessionId();
   const isLoggedIn = !!userToken;
+const [phoneError, setPhoneError] = useState("");
+const handlePhoneChange = (e) => {
+  const value = e.target.value.replace(/\D/g, ""); 
+
+  if (value.length > 10) return;
+
+  setPhoneNumber(value);
+
+  if (value.length === 0) {
+    setPhoneError("Phone number is required");
+  } else if (value.length < 10) {
+    setPhoneError("Phone number must be exactly 10 digits");
+  } else {
+    setPhoneError("");
+  }
+};
 
   const {
     data: cartData,
@@ -57,7 +74,7 @@ export default function Order() {
 
       if (currentToken) {
         const headers = {
-          Authorization: `Leena ${currentToken}`,
+          Authorization: `Bearer ${currentToken}`,
           "x-session-id": currentSessionId,
         };
         const response = await axios.get(`${BACKEND_URL}/cart`, { headers });
@@ -93,7 +110,7 @@ export default function Order() {
 
       const headers = {
         "Content-Type": "application/json",
-        Authorization: `Leena ${currentToken}`,
+        Authorization: `Bearer ${currentToken}`,
         "x-session-id": currentSessionId,
       };
 
@@ -125,6 +142,7 @@ export default function Order() {
   });
 
   const handleSubmit = () => {
+
     if (!isLoggedIn) {
       setLoginDialogOpen(true);
       return;
@@ -135,7 +153,10 @@ export default function Order() {
       navigate("/cart");
       return;
     }
-
+  if (!/^\d{10}$/.test(phoneNumber)) {
+    setPhoneError("Phone number must be exactly 10 digits");
+    return;
+  }
     if (!address.trim()) {
       alert("Please enter shipping address");
       return;
@@ -227,237 +248,311 @@ export default function Order() {
       return sum + price * item.quantity;
     }, 0) || 0;
 
-  return (
-    <Box sx={{ maxWidth: 800, mx: "auto", p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-        Checkout
-      </Typography>
+return (
+  <Box
+    sx={{
+      minHeight: "100vh",
+      background: "#f3f4f6",
+      py: { xs: 3, md: 6 },
+      px: 2,
+    }}
+  >
+    <Box
+      sx={{
+        maxWidth: 1150,
+        mx: "auto",
+        display: "grid",
+        gridTemplateColumns: { xs: "1fr", md: "1.15fr 0.85fr" },
+        gap: { xs: 3, md: 5 },
+        alignItems: "start",
+      }}
+    >
+      <Box sx={{ pt: { xs: 1, md: 4 },display:"flex",flexDirection:"column",justifyContent:"center",flexWrap:"wrap",alignContent:"center",textAlign:"center",alignItems:"center" }}>
+        <Typography
+          sx={{
+            fontSize: { xs: 44, md: 64 },
+            fontWeight: 900,
+            lineHeight: 1.02,
+            letterSpacing: -1.5,
+            color: "#111827",
+          }}
+        >
+          Payment
+          <br />
+          Checkout
+          <br />
+          Design.
+        </Typography>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography variant="h6">
-                {isLoggedIn
-                  ? `👤 Welcome, ${localStorage.getItem("userName") || "User"}`
-                  : "👤 Guest User"}
-              </Typography>
-              <Typography color="text.secondary">
-                {isLoggedIn
-                  ? "You can proceed with your order"
-                  : "Please login to place your order"}
-              </Typography>
-            </Box>
+        <Typography
+          sx={{
+            mt: 2,
+            maxWidth: 380,
+            fontSize: 16,
+            lineHeight: 1.7,
+            color: "#9ca3af",
+          }}
+        >
+          A simple and responsive payment checkout experience designed in Figma.
+        </Typography>
+      </Box>
 
-            {!isLoggedIn && (
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleLoginRedirect}
-              >
-                Login / Register
-              </Button>
-            )}
-          </Box>
-        </CardContent>
-      </Card>
-
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 4,
+          overflow: "hidden",
+          background: "#fff",
+          border: "1px solid #e5e7eb",
+          boxShadow: "0 18px 50px rgba(0,0,0,0.08)",
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+          <Typography sx={{ fontWeight: 900, fontSize: 13, mb: 1 }}>
             Order Summary
           </Typography>
 
-          {cartData.products.map((item, index) => (
-            <Box
-              key={item.productId?._id || index}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 2,
-                pb: 2,
-                borderBottom:
-                  index < cartData.products.length - 1
-                    ? "1px solid #eee"
-                    : "none",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box
-                  component="img"
-                  src={
-                    item.productId?.mainImage?.secure_url ||
-                    "https://via.placeholder.com/60"
-                  }
-                  alt={item.productId?.name}
-                  sx={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 1,
-                    objectFit: "cover",
-                    mr: 2,
-                  }}
-                />
-                <Box>
-                  <Typography sx={{ fontWeight: 600 }}>
-                    {item.productId?.name}
-                  </Typography>
-                  <Typography color="text.secondary" variant="body2">
-                    $
-                    {(
-                      item.productId?.priceAfterDiscount ||
-                      item.productId?.price ||
-                      0
-                    ).toFixed(2)}{" "}
-                    × {item.quantity}
-                  </Typography>
+          <Box
+            sx={{
+              borderRadius: 3,
+              border: "1px solid #eef0f3",
+              p: 1.5,
+              mb: 2.2,
+            }}
+          >
+            {cartData.products.map((item, index) => (
+              <Box
+                key={item.productId?._id || index}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 1.5,
+                  py: 1.2,
+                  borderBottom:
+                    index < cartData.products.length - 1
+                      ? "1px solid #f1f5f9"
+                      : "none",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                  <Box
+                    component="img"
+                    src={
+                      item.productId?.mainImage?.secure_url ||
+                      "https://via.placeholder.com/52"
+                    }
+                    alt={item.productId?.name}
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 2,
+                      objectFit: "cover",
+                      border: "1px solid #eef0f3",
+                      background: "#f3f4f6",
+                    }}
+                  />
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: 13,
+                        color: "#111827",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: 200,
+                      }}
+                    >
+                      {item.productId?.name}
+                    </Typography>
+                    <Typography sx={{ color: "#6b7280", fontSize: 12 }}>
+                      $
+                      {(
+                        item.productId?.priceAfterDiscount ||
+                        item.productId?.price ||
+                        0
+                      ).toFixed(2)}{" "}
+                      × {item.quantity}
+                    </Typography>
+                  </Box>
                 </Box>
+
+                <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                  $
+                  {(
+                    (item.productId?.priceAfterDiscount ||
+                      item.productId?.price ||
+                      0) * item.quantity
+                  ).toFixed(2)}
+                </Typography>
+              </Box>
+            ))}
+
+            <Box sx={{ mt: 1.4, pt: 1.4, borderTop: "1px solid #eef0f3" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ color: "#6b7280", fontWeight: 700, fontSize: 13 }}>
+                  Subtotal
+                </Typography>
+                <Typography sx={{ fontWeight: 900, fontSize: 13 }}>
+                  ${totalPrice.toFixed(2)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ color: "#6b7280", fontWeight: 700, fontSize: 13 }}>
+                  Shipping
+                </Typography>
+                <Typography sx={{ fontWeight: 900, fontSize: 13 }}>Free</Typography>
               </Box>
 
-              <Typography sx={{ fontWeight: 600 }}>
-                $
-                {(
-                  (item.productId?.priceAfterDiscount ||
-                    item.productId?.price ||
-                    0) * item.quantity
-                ).toFixed(2)}
-              </Typography>
-            </Box>
-          ))}
+              <Box sx={{ height: 1, background: "#eef0f3", my: 1.2 }} />
 
-          <Box sx={{ mt: 3, pt: 2, borderTop: "2px solid #ddd" }}>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography>Subtotal:</Typography>
-              <Typography>${totalPrice.toFixed(2)}</Typography>
-            </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography>Shipping:</Typography>
-              <Typography>Free</Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: 2,
-                pt: 2,
-                borderTop: "1px solid #ddd",
-              }}
-            >
-              <Typography variant="h6">Total:</Typography>
-              <Typography variant="h6" color="primary">
-                ${totalPrice.toFixed(2)}
-              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
+                  Total
+                </Typography>
+                <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
+                  ${totalPrice.toFixed(2)}
+                </Typography>
+              </Box>
             </Box>
           </Box>
-        </CardContent>
-      </Card>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          <Typography sx={{ fontWeight: 900, fontSize: 13, mb: 1 }}>
             Shipping Information
           </Typography>
 
-          <TextField
-            label="Shipping Address *"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-          />
+          <Box sx={{ display: "grid", gap: 1.6 }}>
+            <TextField
+              label="Shipping Address *"
+              variant="outlined"
+              fullWidth
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+              InputProps={{
+                sx: {
+                  borderRadius: 2,
+                  background: "#fff",
+                },
+              }}
+            />
 
-          <TextField
-            label="Phone Number *"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-          />
+<Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.6 }}>
+  <TextField
+    label="Phone Number *"
+    variant="outlined"
+    fullWidth
+    value={phoneNumber}
+    onChange={handlePhoneChange}
+    required
+    error={Boolean(phoneError)}
+    helperText={phoneError || " "}
+    inputProps={{
+      inputMode: "numeric",
+      pattern: "[0-9]*",
+      maxLength: 10,
+    }}
+    InputProps={{ sx: { borderRadius: 2, background: "#fff" } }}
+  />
 
-          <TextField
-            label="Coupon Code (Optional)"
-            variant="outlined"
+  <TextField
+    label="Coupon Code (Optional)"
+    variant="outlined"
+    fullWidth
+    value={couponName}
+    onChange={(e) => setCouponName(e.target.value)}
+    InputProps={{ sx: { borderRadius: 2, background: "#fff" } }}
+  />
+</Box>
+
+          </Box>
+
+          {!isLoggedIn && (
+            <Alert severity="info" sx={{ mt: 2, borderRadius: 2 }}>
+              Guest users cannot place orders. Please login or create an account to
+              complete your purchase.
+            </Alert>
+          )}
+
+          {createOrderMutation.isError && isLoggedIn && (
+            <Alert severity="error" sx={{ mt: 2, borderRadius: 2 }}>
+              {createOrderMutation.error?.response?.data?.message ||
+                createOrderMutation.error.message}
+            </Alert>
+          )}
+
+          <Button
+            variant="contained"
+            size="large"
             fullWidth
-            margin="normal"
-            value={couponName}
-            onChange={(e) => setCouponName(e.target.value)}
-          />
+            onClick={handleSubmit}
+            disabled={createOrderMutation.isPending || !isLoggedIn}
+            sx={{
+              mt: 2.4,
+              py: 1.6,
+              borderRadius: 2.5,
+              fontWeight: 900,
+              textTransform: "none",
+              boxShadow: "none",
+              backgroundColor:"#766c6cf5"
+            }}
+          >
+            {createOrderMutation.isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              `Place Order - $${totalPrice.toFixed(2)}`
+            )}
+          </Button>
+
+          <Dialog
+            open={loginDialogOpen}
+            onClose={() => setLoginDialogOpen(false)}
+          >
+            <DialogTitle>Login Required</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                You need to login to place an order. Guest checkout is not
+                available.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setLoginDialogOpen(false)}>Cancel</Button>
+              <Button
+                onClick={handleLoginRedirect}
+                variant="contained"
+                color="primary"
+              >
+                Go to Login
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenSnackbar(false)}
+          >
+            <Alert severity="success" sx={{ width: "100%" }}>
+              Order placed successfully!
+            </Alert>
+          </Snackbar>
         </CardContent>
       </Card>
-
-      <Button
-        variant="contained"
-        size="large"
-        fullWidth
-        onClick={handleSubmit}
-        disabled={createOrderMutation.isPending || !isLoggedIn}
-        sx={{ py: 1.5, fontSize: "1.1rem" }}
-      >
-        {createOrderMutation.isPending ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : (
-          `Place Order - $${totalPrice.toFixed(2)}`
-        )}
-      </Button>
-
-      {!isLoggedIn && (
-        <Alert severity="info" sx={{ mt: 2 }}>
-          Guest users cannot place orders. Please login or create an account to
-          complete your purchase.
-        </Alert>
-      )}
-
-      {createOrderMutation.isError && isLoggedIn && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {createOrderMutation.error?.response?.data?.message ||
-            createOrderMutation.error.message}
-        </Alert>
-      )}
-
-      <Dialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)}>
-        <DialogTitle>Login Required</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            You need to login to place an order. Guest checkout is not
-            available.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLoginDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleLoginRedirect}
-            variant="contained"
-            color="primary"
-          >
-            Go to Login
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Order placed successfully!
-        </Alert>
-      </Snackbar>
     </Box>
-  );
+  </Box>
+);
+
 }

@@ -38,10 +38,6 @@ export default function Categories() {
 
   return (
     <Box className={styles.wrapper}>
-      <Typography variant="h5" component={"h2"} className={styles.title}>
-        Categories
-      </Typography>
-
       <Box className={styles.swiperContainer}>
         <Swiper
           modules={[Virtual, Autoplay]}

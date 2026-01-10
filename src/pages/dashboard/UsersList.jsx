@@ -13,6 +13,9 @@ import {
   TableCell,
   CircularProgress,
   Button,
+  Chip,
+  TableContainer,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -51,78 +54,273 @@ export default function UsersList() {
     }
   };
 
-  return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
-        Users List
-      </Typography>
+  const cardSx = {
+    borderRadius: 4,
+    border: "1px solid rgba(255,255,255,0.08)",
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+    backdropFilter: "blur(10px)",
+    color: "#e5e7eb",
+    overflow: "hidden",
+  };
 
-      {isLoading && <CircularProgress />}
-      {isError && <Typography color="error">Failed to load users</Typography>}
+  const headCellSx = {
+    color: "rgba(229,231,235,0.75)",
+    fontWeight: 900,
+    borderColor: "rgba(255,255,255,0.08)",
+    whiteSpace: "nowrap",
+  };
+
+  const bodyCellSx = {
+    color: "#e5e7eb",
+    borderColor: "rgba(255,255,255,0.06)",
+    whiteSpace: "nowrap",
+  };
+
+  const getStatusChip = (status) => {
+    const s = String(status || "").toLowerCase();
+
+    const isActive =
+      s.includes("active") || s.includes("enabled") || s.includes("online");
+    const isBlocked =
+      s.includes("blocked") || s.includes("banned") || s.includes("disabled");
+
+    const label = status || "-";
+
+    if (isBlocked) {
+      return (
+        <Chip
+          size="small"
+          label={label}
+          sx={{
+            bgcolor: "rgba(239,68,68,0.14)",
+            border: "1px solid rgba(239,68,68,0.28)",
+            color: "#fecaca",
+            fontWeight: 900,
+          }}
+        />
+      );
+    }
+    if (isActive) {
+      return (
+        <Chip
+          size="small"
+          label={label}
+          sx={{
+            bgcolor: "rgba(16,185,129,0.14)",
+            border: "1px solid rgba(16,185,129,0.28)",
+            color: "#bbf7d0",
+            fontWeight: 900,
+          }}
+        />
+      );
+    }
+    return (
+      <Chip
+        size="small"
+        label={label}
+        sx={{
+          bgcolor: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          color: "rgba(229,231,235,0.9)",
+          fontWeight: 900,
+        }}
+      />
+    );
+  };
+
+  const getRoleChip = (role) => {
+    const r = String(role || "").toLowerCase();
+    const isAdmin = r.includes("admin");
+    return (
+      <Chip
+        size="small"
+        label={role || "-"}
+        sx={{
+          bgcolor: isAdmin ? "rgba(124,58,237,0.16)" : "rgba(34,211,238,0.12)",
+          border: isAdmin
+            ? "1px solid rgba(124,58,237,0.28)"
+            : "1px solid rgba(34,211,238,0.22)",
+          color: "#e5e7eb",
+          fontWeight: 900,
+        }}
+      />
+    );
+  };
+
+  return (
+    <Box
+  sx={{
+    minHeight: "100vh",
+    bgcolor: "#070b14", 
+    color: "#e5e7eb",
+    p: 3,
+  }}
+>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: { xs: "flex-start", md: "center" },
+          justifyContent: "space-between",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 2,
+        }}
+      >
+        <Box>
+          <Typography sx={{ fontWeight: 950, fontSize: 20 }}>
+            Users List
+          </Typography>
+          <Typography sx={{ fontSize: 12, opacity: 0.7 }}>
+            Manage users, roles, and statuses
+          </Typography>
+        </Box>
+
+        <Button
+          variant="contained"
+          onClick={() => navigate("/dashboard/users/create")}
+          sx={{
+            textTransform: "none",
+            fontWeight: 900,
+            borderRadius: 2.5,
+            px: 2.2,
+            height: 40,
+            background: "linear-gradient(90deg, #7c3aed, #22d3ee)",
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: "0 14px 40px rgba(0,0,0,0.35)",
+            },
+          }}
+        >
+          Create User
+        </Button>
+      </Box>
+
+      {isLoading && (
+        <Box sx={{ minHeight: "35vh", display: "grid", placeItems: "center" }}>
+          <CircularProgress />
+        </Box>
+      )}
+      {isError && (
+        <Typography color="error">Failed to load users</Typography>
+      )}
 
       {!isLoading && data && (
-        <Card className="mt-4">
-          <CardContent>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>User Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Address</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Edit</TableCell>
-                  <TableCell>Remove</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell>{user.userName}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone || "-"}</TableCell>
-                    <TableCell>{user.address || "-"}</TableCell>
-                    <TableCell>{user.gender || "-"}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.status || "-"}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={() => handleEdit(user._id)}
-                      >
-                        Edit
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => handleRemove(user._id)}
-                      >
-                        Remove
-                      </Button>
-                    </TableCell>
+        <Card elevation={0} sx={cardSx}>
+          <CardContent sx={{ p: 0 }}>
+            <Box sx={{ p: 2.2 }}>
+              <Typography sx={{ fontWeight: 950, fontSize: 14 }}>
+                Users
+              </Typography>
+              <Typography sx={{ fontSize: 12, opacity: 0.7 }}>
+                Total: {data.length}
+              </Typography>
+            </Box>
+
+            <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+
+            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+              <Table sx={{ minWidth: 1050 }}>
+                <TableHead>
+                  <TableRow>
+                    {[
+                      "User Name",
+                      "Email",
+                      "Phone",
+                      "Address",
+                      "Gender",
+                      "Role",
+                      "Status",
+                      "Edit",
+                      "Remove",
+                    ].map((h) => (
+                      <TableCell key={h} sx={headCellSx}>
+                        {h}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+
+                <TableBody>
+                  {data.map((user) => (
+                    <TableRow
+                      key={user._id}
+                      hover
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "rgba(255,255,255,0.03)",
+                        },
+                      }}
+                    >
+                      <TableCell sx={{ ...bodyCellSx, fontWeight: 900 }}>
+                        {user.userName}
+                      </TableCell>
+                      <TableCell sx={{ ...bodyCellSx, opacity: 0.9 }}>
+                        {user.email}
+                      </TableCell>
+                      <TableCell sx={bodyCellSx}>{user.phone || "-"}</TableCell>
+                      <TableCell sx={bodyCellSx}>
+                        {user.address || "-"}
+                      </TableCell>
+                      <TableCell sx={bodyCellSx}>
+                        {user.gender || "-"}
+                      </TableCell>
+                      <TableCell sx={bodyCellSx}>
+                        {getRoleChip(user.role)}
+                      </TableCell>
+                      <TableCell sx={bodyCellSx}>
+                        {getStatusChip(user.status)}
+                      </TableCell>
+
+                      <TableCell sx={bodyCellSx}>
+                        <Button
+                          size="small"
+                          onClick={() => handleEdit(user._id)}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 900,
+                            borderRadius: 2,
+                            px: 1.6,
+                            color: "#e5e7eb",
+                            border: "1px solid rgba(34,211,238,0.30)",
+                            bgcolor: "rgba(34,211,238,0.08)",
+                            "&:hover": {
+                              bgcolor: "rgba(34,211,238,0.14)",
+                            },
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
+
+                      <TableCell sx={bodyCellSx}>
+                        <Button
+                          size="small"
+                          onClick={() => handleRemove(user._id)}
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: 900,
+                            borderRadius: 2,
+                            px: 1.6,
+                            color: "#fecaca",
+                            border: "1px solid rgba(239,68,68,0.30)",
+                            bgcolor: "rgba(239,68,68,0.10)",
+                            "&:hover": {
+                              bgcolor: "rgba(239,68,68,0.16)",
+                            },
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </CardContent>
         </Card>
       )}
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => navigate("/dashboard/users/create")}
-        sx={{ mt: 2 }}
-      >
-        Create User
-      </Button>
     </Box>
   );
 }

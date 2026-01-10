@@ -11,13 +11,7 @@ import {
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-const theme = createTheme({
-  palette: {
-    background: {
-      default: "#bbbab4",
-    },
-  },
-});
+import theme from "./style/theme.js"
 export default function App() {
   const queryClient = new QueryClient();
 

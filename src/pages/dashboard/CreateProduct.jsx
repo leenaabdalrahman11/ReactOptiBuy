@@ -10,6 +10,8 @@ import {
   Alert,
   MenuItem,
   Autocomplete,
+  Card,
+  CardContent,
 } from "@mui/material";
 
 export default function CreateProduct() {
@@ -31,9 +33,37 @@ export default function CreateProduct() {
     tags: [],
     CategoryId: "",
     subCategoryId: "",
+    description: "",
     mainImage: null,
     subImages: [],
   });
+
+  const accent = "#22d3ee";
+  const bg = "#070B12";
+  const panel = "rgba(15, 23, 42, 0.55)";
+  const border = "rgba(148, 163, 184, 0.12)";
+  const grid = "rgba(148, 163, 184, 0.08)";
+
+  const glassCardSx = {
+    background: `linear-gradient(180deg, ${panel}, rgba(15,23,42,0.35))`,
+    border: `1px solid ${border}`,
+    borderRadius: 3,
+    boxShadow: "0 18px 60px rgba(0,0,0,0.55)",
+    backdropFilter: "blur(10px)",
+  };
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "rgba(2,6,23,0.35)",
+      color: "white",
+      borderRadius: 2,
+      "& fieldset": { borderColor: border },
+      "&:hover fieldset": { borderColor: "rgba(34,211,238,0.4)" },
+      "&.Mui-focused fieldset": { borderColor: accent },
+    },
+    "& .MuiInputLabel-root": { color: "rgba(226,232,240,0.7)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: accent },
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -50,7 +80,7 @@ export default function CreateProduct() {
   useEffect(() => {
     if (!formData.CategoryId) {
       setSubCategories([]);
-      setFormData((prev) => ({ ...prev, subCategoryId: "" }));
+      setFormData((p) => ({ ...p, subCategoryId: "" }));
       return;
     }
 
@@ -60,11 +90,10 @@ export default function CreateProduct() {
           `/subcategory/byCategory/${formData.CategoryId}`
         );
         setSubCategories(data.subCategories || []);
-        setFormData((prev) => ({ ...prev, subCategoryId: "" }));
-      } catch (err) {
-        console.error("Failed to fetch subcategories:", err);
+        setFormData((p) => ({ ...p, subCategoryId: "" }));
+      } catch {
         setSubCategories([]);
-        setFormData((prev) => ({ ...prev, subCategoryId: "" }));
+        setFormData((p) => ({ ...p, subCategoryId: "" }));
       }
     };
 
@@ -80,30 +109,28 @@ export default function CreateProduct() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
-  const handleTagsChange = (event, newValue) => {
-    setFormData((prev) => ({ ...prev, tags: newValue }));
+  const handleTagsChange = (_, newValue) => {
+    setFormData((p) => ({ ...p, tags: newValue }));
   };
 
   const handleMainImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setFormData((prev) => ({ ...prev, mainImage: file }));
-
+    setFormData((p) => ({ ...p, mainImage: file }));
     if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
     setMainImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubImagesChange = (e) => {
     const files = Array.from(e.target.files || []);
-    setFormData((prev) => ({ ...prev, subImages: files }));
+    setFormData((p) => ({ ...p, subImages: files }));
 
     subImagesPreview.forEach((url) => URL.revokeObjectURL(url));
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setSubImagesPreview(previews);
+    setSubImagesPreview(files.map((f) => URL.createObjectURL(f)));
   };
 
   const handleSubmit = async (e) => {
@@ -117,22 +144,19 @@ export default function CreateProduct() {
       dataToSend.append("price", formData.price);
       dataToSend.append("discount", formData.discount);
       dataToSend.append("stock", formData.stock);
+      dataToSend.append("description", formData.description);
+
       dataToSend.append("CategoryId", formData.CategoryId);
 
-      if (formData.subCategoryId) {
+      if (formData.subCategoryId)
         dataToSend.append("subCategoryId", formData.subCategoryId);
-      }
 
-      formData.tags.forEach((tag) => dataToSend.append("tags[]", tag));
+      formData.tags.forEach((t) => dataToSend.append("tags[]", t));
 
       if (formData.mainImage)
         dataToSend.append("mainImage", formData.mainImage);
 
-      if (formData.subImages.length > 0) {
-        formData.subImages.forEach((file) => {
-          dataToSend.append("subImages", file);
-        });
-      }
+      formData.subImages.forEach((f) => dataToSend.append("subImages", f));
 
       await AxiosUserInstance.post("/products", dataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -141,198 +165,257 @@ export default function CreateProduct() {
       alert("Product created successfully!");
       navigate("/dashboard/products");
     } catch (err) {
-      console.error(err.response?.data || err);
       setError(err.response?.data?.message || "Failed to create product");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (loading)
+    return (
+      <Box sx={{ display: "grid", placeItems: "center", py: 8 }}>
+        <CircularProgress sx={{ color: accent }} />
+      </Box>
+    );
 
   return (
-    <Box maxWidth="600px" mx="auto">
-      <Typography variant="h5" gutterBottom>
-        Create Product
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <TextField
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Price"
-          name="price"
-          type="number"
-          value={formData.price}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Discount (%)"
-          name="discount"
-          type="number"
-          value={formData.discount}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Stock"
-          name="stock"
-          type="number"
-          value={formData.stock}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <Autocomplete
-          multiple
-          freeSolo
-          options={[]}
-          value={formData.tags}
-          onChange={handleTagsChange}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Tags"
-              placeholder="Add tags"
-              margin="normal"
-              fullWidth
-            />
-          )}
-        />
-
-        <TextField
-          select
-          label="Category"
-          name="CategoryId"
-          value={formData.CategoryId}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        >
-          <MenuItem value="">Select Category</MenuItem>
-          {categories.map((cat) => (
-            <MenuItem key={cat._id} value={cat._id}>
-              {cat.name}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        {subCategories.length > 0 && (
-          <TextField
-            select
-            label="SubCategory (optional)"
-            name="subCategoryId"
-            value={formData.subCategoryId}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          >
-            <MenuItem value="">None</MenuItem>
-            {subCategories.map((sub) => (
-              <MenuItem key={sub._id} value={sub._id}>
-                {sub.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-
-        <Box mt={2}>
-          <Typography>Main Image</Typography>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleMainImageChange}
-          />
-
-          {mainImagePreview && (
-            <Box mt={1}>
-              <img
-                src={mainImagePreview}
-                alt="Main Preview"
-                style={{
-                  width: 120,
-                  height: 120,
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  border: "1px solid #ddd",
-                }}
-              />
-            </Box>
-          )}
-        </Box>
-
-        <Box mt={2}>
-          <Typography>Sub Images</Typography>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleSubImagesChange}
-          />
-
-          {subImagesPreview.length > 0 && (
-            <Box
-              mt={1}
-              sx={{
-                display: "flex",
-                gap: 1,
-                flexWrap: "wrap",
-              }}
-            >
-              {subImagesPreview.map((src, idx) => (
-                <Box
-                  key={idx}
-                  sx={{
-                    width: 90,
-                    height: 90,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    border: "1px solid #ddd",
-                  }}
-                >
-                  <img
-                    src={src}
-                    alt={`Sub ${idx}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
-          )}
-        </Box>
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
+    <Box
+      sx={{
+        minHeight: "calc(100vh - 64px)",
+        px: 3,
+        py: 3,
+        background: `
+          radial-gradient(900px 500px at 20% 10%, rgba(34,211,238,0.12), transparent 60%),
+          linear-gradient(180deg, ${bg}, #05070D)
+        `,
+        color: "white",
+      }}
+    >
+      <Box maxWidth={800} mx="auto">
+        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2 }}>
           Create Product
-        </Button>
-      </form>
+        </Typography>
+
+        <Card sx={glassCardSx}>
+          <CardContent>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+              <TextField
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                fullWidth
+                sx={fieldSx}
+                margin="normal"
+              />
+              <TextField
+                label="Price"
+                name="price"
+                type="number"
+                value={formData.price}
+                onChange={handleChange}
+                fullWidth
+                sx={fieldSx}
+                margin="normal"
+              />
+              <TextField
+                label="Discount (%)"
+                name="discount"
+                type="number"
+                value={formData.discount}
+                onChange={handleChange}
+                fullWidth
+                sx={fieldSx}
+                margin="normal"
+              />
+              <TextField
+                label="Stock"
+                name="stock"
+                type="number"
+                value={formData.stock}
+                onChange={handleChange}
+                fullWidth
+                sx={fieldSx}
+                margin="normal"
+              />
+              <TextField
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                fullWidth
+                multiline
+                minRows={4}
+                sx={fieldSx}
+                margin="normal"
+                placeholder="Write product description..."
+              />
+
+              <Autocomplete
+                multiple
+                freeSolo
+                options={[]}
+                value={formData.tags}
+                onChange={handleTagsChange}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Tags"
+                    fullWidth
+                    margin="normal"
+                    sx={fieldSx}
+                  />
+                )}
+              />
+
+              <TextField
+                select
+                label="Category"
+                name="CategoryId"
+                value={formData.CategoryId}
+                onChange={handleChange}
+                fullWidth
+                sx={fieldSx}
+                margin="normal"
+              >
+                <MenuItem value="">Select Category</MenuItem>
+                {categories.map((c) => (
+                  <MenuItem key={c._id} value={c._id}>
+                    {c.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              {subCategories.length > 0 && (
+                <TextField
+                  select
+                  label="SubCategory (optional)"
+                  name="subCategoryId"
+                  value={formData.subCategoryId}
+                  onChange={handleChange}
+                  fullWidth
+                  sx={fieldSx}
+                  margin="normal"
+                >
+                  <MenuItem value="">None</MenuItem>
+                  {subCategories.map((s) => (
+                    <MenuItem key={s._id} value={s._id}>
+                      {s.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+
+              <Box mt={2} color={"white"}>
+                <Typography fontSize={13} mb={1}>
+                  Main Image
+                </Typography>
+                <Box mt={2} color={"white"}>
+                  <Typography fontSize={13} mb={1}>
+                    Main Image
+                  </Typography>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMainImageChange}
+                  />
+
+                  {mainImagePreview && (
+                    <Box
+                      mt={2}
+                      sx={{
+                        width: 220,
+                        height: 220,
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        border: "1px solid rgba(148,163,184,0.18)",
+                        backgroundColor: "rgba(2, 6, 23, 0.25)",
+                      }}
+                    >
+                      <img
+                        src={mainImagePreview}
+                        alt="Main preview"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
+              <Box mt={2} color={"white"}>
+                <Typography fontSize={13} mb={1}>
+                  Sub Images
+                </Typography>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleSubImagesChange}
+                />
+
+                {subImagesPreview?.length > 0 && (
+                  <Box
+                    mt={2}
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {subImagesPreview.map((src, idx) => (
+                      <Box
+                        key={src + idx}
+                        sx={{
+                          width: 90,
+                          height: 90,
+                          borderRadius: 2,
+                          overflow: "hidden",
+                          border: "1px solid rgba(148,163,184,0.18)",
+                          backgroundColor: "rgba(2, 6, 23, 0.25)",
+                        }}
+                      >
+                        <img
+                          src={src}
+                          alt={`Sub preview ${idx + 1}`}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  fontWeight: 800,
+                  background: `linear-gradient(90deg, ${accent}, #6366f1)`,
+                }}
+              >
+                Create Product
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }

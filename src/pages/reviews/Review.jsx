@@ -1,151 +1,168 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { useQuery } from "@tanstack/react-query";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/pagination";
-import style from "./Review.module.css";
-import { Mousewheel, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css/navigation";
+
 import AxiosInstance from "../../api/AxiosInstance";
-import { Box, Card, Typography } from "@mui/material";
+import { Box, Typography, Avatar, IconButton } from "@mui/material";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
 import { useNavigate } from "react-router-dom";
+import styles from "./Review.module.css";
+
+import { useTranslation } from "react-i18next";
 
 export default function Review() {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+
+  const prevRef = React.useRef(null);
+  const nextRef = React.useRef(null);
 
   const fetchReviews = async () => {
+    const response = await AxiosInstance.get("/reviews/latest");
+    return response.data.reviews || [];
+  };
+
+  const { data: reviews = [], isLoading } = useQuery({
+    queryKey: ["review-latest"],
+    queryFn: fetchReviews,
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading || !reviews.length) return null;
+
+  const formatDate = (iso) => {
+    if (!iso) return "";
     try {
-      const response = await AxiosInstance.get("/reviews/latest");
-      return response.data.reviews || [];
-    } catch (err) {
-      if (err.response?.status === 404) {
-        return [];
-      }
-      throw err;
+      const locale = i18n.language === "ar" ? "ar" : "en";
+      return new Date(iso).toLocaleDateString(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return "";
     }
   };
 
-  const {
-    data = [],
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["review"],
-    queryFn: fetchReviews,
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: false,
-  });
-  console.log("bbbbbbbbbb", data);
-
   return (
-    <Box
-      style={{
-        height: "260px",
-        width: "100%",
-        maxWidth: "400px",
-        margin: "40px auto",
-        overflow: "hidden",
-      }}
-    >
-      <Typography
-        variant="h5"
-        component={"h2"}
-        sx={{
-          fontSize: {
-            xs: "0.95rem",
-            sm: "1.1rem",
-            md: "1.10rem",
-          },
-        }}
-      >
-        Comments
+    <Box className={styles.wrap}>
+      <Typography className={styles.kicker}>
+        {t("reviews.kicker", "TESTIMONIALS")}
       </Typography>
-      <Swiper
-        direction="vertical"
-        slidesPerView={1}
-        spaceBetween={20}
-        mousewheel={{
-          forceToAxis: true,
-          releaseOnEdges: true,
-        }}
-        autoplay={{
-          delay: 2500,
-          disableOnInteraction: false,
-        }}
-        pagination={false}
-        modules={[Mousewheel, Pagination, Autoplay]}
-        className={style.mySwiper}
-        style={{ height: "100%", marginTop: "20px" }}
-      >
-        {data.map((rev) => (
-          <SwiperSlide key={rev._id || rev.id}>
-            <Card sx={{ p: 2, borderRadius: 3, boxShadow: 2 }}>
-              <Box display={"flex"} sx={{ justifyContent: "space-between" }}>
-                <Typography variant="span" fontWeight={200}>
-                  {rev.createdBy?.userName} :
-                </Typography>
 
-                <Typography sx={{ color: "#f5b400", mb: 1 }}>
-                  {"⭐".repeat(rev.rating)}
-                </Typography>
-              </Box>
+      <Typography className={styles.title}>
+        {t("reviews.title", "Our Client Reviews")}
+      </Typography>
 
-              <Box
-                height={"100px"}
-                width={"100%"}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignContent: "center",
-                  fontSize: "13px",
-                  backgroundColor: "#844f70bf",
-                  borderRadius: "12px",
-                  mb: 2,
-                  color: "text.secondary",
-                }}
-              >
-                <Typography variant="body2">{rev.comment}</Typography>
-              </Box>
-              <Box>
-                <Box
-                  display={"flex"}
-                  width={"90%"}
-                  sx={{
-                    px: 3,
-                    justifyContent: "space-between",
-                    alignContent: "space-between",
-                  }}
-                >
-                  <span
-                    onClick={() =>
-                      navigate(`/product-details/${rev.productId?._id}`)
-                    }
+      <Box className={styles.sliderShell}>
+        <IconButton
+          ref={prevRef}
+          className={`${styles.navBtn} ${styles.prev}`}
+          aria-label="prev"
+        >
+          <ArrowBackIosNewRoundedIcon fontSize="small" />
+        </IconButton>
+
+        <IconButton
+          ref={nextRef}
+          className={`${styles.navBtn} ${styles.next}`}
+          aria-label="next"
+        >
+          <ArrowForwardIosRoundedIcon fontSize="small" />
+        </IconButton>
+
+        <Swiper
+          dir="ltr"
+          modules={[Navigation, Autoplay]}
+          autoplay={{ delay: 2800, disableOnInteraction: false }}
+          spaceBetween={22}
+          slidesPerView={1}
+          breakpoints={{
+            700: { slidesPerView: 2 },
+            1050: { slidesPerView: 3 },
+          }}
+          onBeforeInit={(swiper) => {
+            swiper.params.navigation.prevEl = prevRef.current;
+            swiper.params.navigation.nextEl = nextRef.current;
+          }}
+          navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
+          className={styles.swiper}
+        >
+          {reviews.map((rev) => {
+            const id = rev._id || rev.id;
+            const product = rev.productId;
+
+            const bg =
+              product?.mainImage?.secure_url ||
+              product?.mainImage?.url ||
+              product?.image?.secure_url ||
+              product?.image?.url ||
+              product?.images?.[0]?.secure_url ||
+              product?.images?.[0]?.url ||
+              "";
+
+            const userName =
+              rev.createdBy?.userName || t("common.anonymous", "Anonymous");
+            const rating = Math.max(0, Math.min(5, Number(rev.rating || 0)));
+            const comment = rev.comment || "";
+            const productId = product?._id || product?.id;
+            const roleText = product?.name ? product.name : t("reviews.customer", "Customer");
+
+            return (
+              <SwiperSlide key={id} className={styles.slide}>
+                <Box className={styles.card}>
+                  <Box
+                    className={styles.bg}
                     style={{
-                      cursor: "pointer",
-                      fontWeight: 600,
-                      transition: "0.2s",
+                      backgroundImage: bg ? `url("${bg}")` : "none",
+                      backgroundColor: bg ? "transparent" : "#f3f4f6",
                     }}
-                    onMouseEnter={(e) =>
-                      (e.target.style.textDecoration = "underline")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.target.style.textDecoration = "none")
-                    }
-                  >
-                    View Product Details
-                  </span>
+                  />
+                  <Box className={styles.bgShade} />
 
-                  <span>{new Date(rev.createdAt).toLocaleDateString()}</span>
+                  <Box className={styles.overlay}>
+                    <Box className={styles.avatarWrap}>
+                      <Avatar className={styles.avatar}>
+                        {userName?.[0]?.toUpperCase?.() || "U"}
+                      </Avatar>
+                    </Box>
+
+                    <Typography className={styles.name}>{userName}</Typography>
+                    <Typography className={styles.role}>{roleText}</Typography>
+
+                    <Typography className={styles.comment}>{comment}</Typography>
+
+                    <Typography className={styles.stars}>
+                      {"★".repeat(rating)}
+                      <span className={styles.starsEmpty}>
+                        {"★".repeat(5 - rating)}
+                      </span>
+                    </Typography>
+
+                    <Box className={styles.footer}>
+                      <span
+                        className={styles.link}
+                        onClick={() =>
+                          productId && navigate(`/product-details/${productId}`)
+                        }
+                      >
+                        {t("reviews.viewProduct", "View Product Details")}
+                      </span>
+
+                      <span className={styles.date}>{formatDate(rev.createdAt)}</span>
+                    </Box>
+                  </Box>
                 </Box>
-              </Box>
-            </Card>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
+      </Box>
     </Box>
   );
 }

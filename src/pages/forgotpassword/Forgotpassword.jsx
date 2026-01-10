@@ -22,7 +22,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 5 }}>
+    <Container maxWidth="sm" sx={{ mt: 15 }}>
       {msg && <Alert sx={{ mb: 2 }}>{msg}</Alert>}
 
       <Box

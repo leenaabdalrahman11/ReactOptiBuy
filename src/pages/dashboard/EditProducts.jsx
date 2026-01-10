@@ -10,6 +10,8 @@ import {
   Alert,
   MenuItem,
   Autocomplete,
+  Card,
+  CardContent,
 } from "@mui/material";
 import ProductReviewsList from "./ProductReviewsList";
 
@@ -42,7 +44,72 @@ export default function EditProducts() {
     stock: "",
     tags: [],
     categoryId: "",
+    description: "",
   });
+
+  const accent = "#22d3ee";
+  const bg = "#070B12";
+  const panel = "rgba(15, 23, 42, 0.55)";
+  const border = "rgba(148, 163, 184, 0.12)";
+  const grid = "rgba(148, 163, 184, 0.08)";
+
+  const glassCardSx = {
+    background: `linear-gradient(180deg, ${panel} 0%, rgba(15, 23, 42, 0.35) 100%)`,
+    border: `1px solid ${border}`,
+    boxShadow: "0 18px 60px rgba(0,0,0,0.55)",
+    borderRadius: 3,
+    backdropFilter: "blur(10px)",
+  };
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      color: "rgba(255,255,255,0.92)",
+      borderRadius: 2,
+      backgroundColor: "rgba(2, 6, 23, 0.35)",
+      "& fieldset": { borderColor: border },
+      "&:hover fieldset": { borderColor: "rgba(34, 211, 238, 0.35)" },
+      "&.Mui-focused fieldset": { borderColor: accent },
+    },
+    "& .MuiInputLabel-root": { color: "rgba(226,232,240,0.72)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: accent },
+  };
+
+  const menuPaperSx = {
+    mt: 1,
+    backgroundColor: "rgba(2,6,23,0.95)",
+    border: `1px solid ${border}`,
+    color: "rgba(255,255,255,0.9)",
+    "& .MuiMenuItem-root": {
+      fontSize: 14,
+      "&.Mui-selected": { backgroundColor: "rgba(34,211,238,0.18)" },
+      "&.Mui-selected:hover": { backgroundColor: "rgba(34,211,238,0.24)" },
+    },
+  };
+
+  const primaryBtnSx = {
+    borderRadius: 2,
+    fontWeight: 800,
+    textTransform: "none",
+    background: `linear-gradient(90deg, ${accent} 0%, rgba(99,102,241,0.95) 100%)`,
+    boxShadow: "0 12px 30px rgba(34,211,238,0.18)",
+    "&:hover": {
+      background: `linear-gradient(90deg, rgba(34,211,238,0.95) 0%, rgba(99,102,241,0.9) 100%)`,
+    },
+  };
+
+  const dangerChipSx = {
+    backgroundColor: "rgba(239,68,68,0.14)",
+    border: "1px solid rgba(239,68,68,0.28)",
+    color: "rgba(255,255,255,0.92)",
+    boxShadow: "0 10px 22px rgba(0,0,0,0.35)",
+  };
+
+  const imageFrameSx = {
+    borderRadius: 2,
+    overflow: "hidden",
+    border: `1px solid rgba(148, 163, 184, 0.18)`,
+    backgroundColor: "rgba(2, 6, 23, 0.25)",
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -70,6 +137,7 @@ export default function EditProducts() {
           stock: p.stock ?? "",
           tags: p.tags || [],
           categoryId: p.categoryId || "",
+          description: p.description || "",
         });
 
         setSubCategoryId(p.subCategoryId || "");
@@ -194,6 +262,7 @@ export default function EditProducts() {
       dataToSend.append("discount", formData.discount);
       dataToSend.append("stock", formData.stock);
       dataToSend.append("categoryId", formData.categoryId);
+      dataToSend.append("description", formData.description); 
 
       formData.tags.forEach((tag) => dataToSend.append("tags[]", tag));
       if (subCategoryId) dataToSend.append("subCategoryId", subCategoryId);
@@ -218,323 +287,530 @@ export default function EditProducts() {
     }
   };
 
-  if (loading || categories.length === 0) return <CircularProgress />;
+  if (loading || categories.length === 0)
+    return (
+      <Box
+        sx={{
+          minHeight: "calc(100vh - 64px)",
+          display: "grid",
+          placeItems: "center",
+          background: `radial-gradient(900px 500px at 20% 10%, rgba(34,211,238,0.12) 0%, transparent 60%),
+                       radial-gradient(900px 500px at 80% 20%, rgba(99,102,241,0.10) 0%, transparent 55%),
+                       linear-gradient(180deg, ${bg} 0%, #05070D 100%)`,
+        }}
+      >
+        <CircularProgress sx={{ color: accent }} />
+      </Box>
+    );
 
   return (
-    <Box maxWidth="600px" mx="auto">
-      <Typography variant="h5" gutterBottom>
-        Edit Product
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      <input
-        ref={subImageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        onChange={handleSubImagesChange}
-      />
-
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <TextField
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Price"
-          name="price"
-          type="number"
-          value={formData.price}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Discount (%)"
-          name="discount"
-          type="number"
-          value={formData.discount}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <TextField
-          label="Stock"
-          name="stock"
-          type="number"
-          value={formData.stock}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-        <Autocomplete
-          multiple
-          freeSolo
-          options={[]}
-          value={formData.tags}
-          onChange={(e, newValue) =>
-            setFormData((prev) => ({ ...prev, tags: newValue }))
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Tags"
-              placeholder="Add tags"
-              margin="normal"
-              fullWidth
-            />
-          )}
-        />
-
-        <TextField
-          select
-          label="Category"
-          name="categoryId"
-          value={formData.categoryId}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
+    <Box
+      sx={{
+        minHeight: "calc(100vh - 64px)",
+        px: { xs: 2, md: 3 },
+        py: { xs: 2, md: 3 },
+        color: "white",
+        background: `radial-gradient(900px 500px at 20% 10%, rgba(34,211,238,0.12) 0%, transparent 60%),
+                     radial-gradient(900px 500px at 80% 20%, rgba(99,102,241,0.10) 0%, transparent 55%),
+                     linear-gradient(180deg, ${bg} 0%, #05070D 100%)`,
+        position: "relative",
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `
+            linear-gradient(${grid} 1px, transparent 1px),
+            linear-gradient(90deg, ${grid} 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          opacity: 0.5,
+          pointerEvents: "none",
+        },
+      }}
+    >
+      <Box sx={{ position: "relative", zIndex: 1, maxWidth: 980, mx: "auto" }}>
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
         >
-          {categories.map((cat) => (
-            <MenuItem key={cat._id} value={cat._id}>
-              {cat.name}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        {subCategories.length > 0 && (
-          <Box display="flex" alignItems="center" gap={1} mt={2}>
-            <TextField
-              select
-              label="SubCategory (optional)"
-              name="subCategoryId"
-              value={subCategoryId}
-              onChange={(e) => setSubCategoryId(e.target.value)}
-              fullWidth
+          <Box>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 800, letterSpacing: 0.2, lineHeight: 1.1 }}
             >
-              <MenuItem value="">None</MenuItem>
-              {subCategories.map((sub) => (
-                <MenuItem key={sub._id} value={sub._id}>
-                  {sub.name}
-                </MenuItem>
-              ))}
-            </TextField>
+              Edit Product
+            </Typography>
+            <Typography
+              sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}
+            >
+              Update product info, images, and tags.
+            </Typography>
           </Box>
-        )}
 
-        <Box mt={2}>
-          <Typography>Main Image</Typography>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleMainImageChange}
-          />
-
-          {serverMainImage?.secure_url && !mainImagePreview && (
-            <Box mt={1} sx={{ width: 120, height: 120 }}>
-              <img
-                src={serverMainImage.secure_url}
-                alt="Server Main"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  border: "1px solid #ddd",
-                }}
-              />
-            </Box>
-          )}
-
-          {mainImagePreview && (
-            <Box mt={1} sx={{ position: "relative", width: 120, height: 120 }}>
-              <img
-                src={mainImagePreview}
-                alt="New Main Preview"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: 12,
-                  border: "1px solid #ddd",
-                }}
-              />
-              <Box
-                onClick={removeNewMainImage}
-                sx={{
-                  position: "absolute",
-                  top: -6,
-                  right: -6,
-                  width: 22,
-                  height: 22,
-                  bgcolor: "error.main",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 14,
-                  cursor: "pointer",
-                  boxShadow: 2,
-                }}
-              >
-                ✕
-              </Box>
-            </Box>
-          )}
-        </Box>
-
-        <Box mt={2}>
-          <Typography>Sub Images</Typography>
-
-          <Box
-            mt={1}
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/dashboard/products")}
             sx={{
-              display: "flex",
-              gap: 1,
-              flexWrap: "wrap",
-              alignItems: "center",
-              opacity: isDeleting ? 0.6 : 1,
-              pointerEvents: isDeleting ? "none" : "auto",
+              borderRadius: 2,
+              fontWeight: 800,
+              textTransform: "none",
+              color: "rgba(255,255,255,0.86)",
+              borderColor: "rgba(148, 163, 184, 0.25)",
+              backgroundColor: "rgba(2, 6, 23, 0.10)",
+              "&:hover": {
+                borderColor: "rgba(34,211,238,0.45)",
+                backgroundColor: "rgba(34,211,238,0.06)",
+              },
             }}
           >
-            {serverSubImages.map((img) => (
-              <Box
-                key={img.public_id}
-                sx={{
-                  position: "relative",
-                  width: 90,
-                  height: 90,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border: "1px solid #ddd",
-                }}
-              >
-                <img
-                  src={img.secure_url}
-                  alt="Server Sub"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <Box
-                  onClick={() => removeServerSubImage(img.public_id)}
-                  sx={{
-                    position: "absolute",
-                    top: 2,
-                    right: 2,
-                    width: 20,
-                    height: 20,
-                    bgcolor: "error.main",
-                    color: "#fff",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    cursor: "pointer",
-                    boxShadow: 2,
-                    lineHeight: 1,
-                  }}
-                >
-                  ✕
-                </Box>
-              </Box>
-            ))}
-
-            {subImagesPreview.map((src, idx) => (
-              <Box
-                key={`new-${idx}`}
-                sx={{
-                  position: "relative",
-                  width: 90,
-                  height: 90,
-                  borderRadius: 2,
-                  overflow: "hidden",
-                  border: "1px solid #ddd",
-                }}
-              >
-                <img
-                  src={src}
-                  alt={`New Sub ${idx}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                <Box
-                  onClick={() => removeNewSubImage(idx)}
-                  sx={{
-                    position: "absolute",
-                    top: 2,
-                    right: 2,
-                    width: 20,
-                    height: 20,
-                    bgcolor: "error.main",
-                    color: "#fff",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    cursor: "pointer",
-                    boxShadow: 2,
-                    lineHeight: 1,
-                  }}
-                >
-                  ✕
-                </Box>
-              </Box>
-            ))}
-
-            <Box
-              onClick={() => subImageInputRef.current?.click()}
-              sx={{
-                width: 90,
-                height: 90,
-                borderRadius: 2,
-                border: "2px dashed #aaa",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "text.secondary",
-                fontSize: 32,
-                "&:hover": {
-                  borderColor: "primary.main",
-                  color: "primary.main",
-                },
-              }}
-            >
-              +
-            </Box>
-          </Box>
+            Back
+          </Button>
         </Box>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Update Product
-        </Button>
-      </form>
+        <Card sx={glassCardSx}>
+          <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+            {error && (
+              <Alert
+                severity="error"
+                sx={{
+                  mb: 2,
+                  borderRadius: 2,
+                  backgroundColor: "rgba(239,68,68,0.10)",
+                  border: "1px solid rgba(239,68,68,0.25)",
+                  color: "rgba(255,255,255,0.9)",
+                  "& .MuiAlert-icon": { color: "rgb(239,68,68)" },
+                }}
+              >
+                {error}
+              </Alert>
+            )}
 
-      <Box mt={4}>
-        <Typography variant="h6" gutterBottom>
-          Product Reviews
-        </Typography>
-        {product?._id && <ProductReviewsList productId={product._id} />}
+            <input
+              ref={subImageInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              onChange={handleSubImagesChange}
+            />
+
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                  gap: 2,
+                }}
+              >
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="none"
+                  sx={fieldSx}
+                />
+
+                <TextField
+                  label="Price"
+                  name="price"
+                  type="number"
+                  value={formData.price}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="none"
+                  sx={fieldSx}
+                />
+
+                <TextField
+                  label="Discount (%)"
+                  name="discount"
+                  type="number"
+                  value={formData.discount}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="none"
+                  sx={fieldSx}
+                />
+
+                <TextField
+                  label="Stock"
+                  name="stock"
+                  type="number"
+                  value={formData.stock}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="none"
+                  sx={fieldSx}
+                />
+              </Box>
+
+              <Autocomplete
+                multiple
+                freeSolo
+                options={[]}
+                value={formData.tags}
+                onChange={(e, newValue) =>
+                  setFormData((prev) => ({ ...prev, tags: newValue }))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Tags"
+                    placeholder="Add tags"
+                    margin="normal"
+                    fullWidth
+                    sx={fieldSx}
+                  />
+                )}
+              />
+
+              <TextField
+                select
+                label="Category"
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                sx={fieldSx}
+                SelectProps={{
+                  MenuProps: { PaperProps: { sx: menuPaperSx } },
+                }}
+              >
+                {categories.map((cat) => (
+                  <MenuItem key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                multiline
+                minRows={4}
+                sx={fieldSx}
+              />
+
+              {subCategories.length > 0 && (
+                <Box display="flex" alignItems="center" gap={1} mt={2}>
+                  <TextField
+                    select
+                    label="SubCategory (optional)"
+                    name="subCategoryId"
+                    value={subCategoryId}
+                    onChange={(e) => setSubCategoryId(e.target.value)}
+                    fullWidth
+                    sx={fieldSx}
+                    SelectProps={{
+                      MenuProps: { PaperProps: { sx: menuPaperSx } },
+                    }}
+                  >
+                    <MenuItem value="">None</MenuItem>
+                    {subCategories.map((sub) => (
+                      <MenuItem key={sub._id} value={sub._id}>
+                        {sub.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Box>
+              )}
+
+              <Box mt={2}>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    color: "rgba(226,232,240,0.75)",
+                    fontWeight: 800,
+                    letterSpacing: 0.2,
+                    mb: 1,
+                  }}
+                >
+                  Main Image
+                </Typography>
+
+                <Box
+                  sx={{
+                    ...glassCardSx,
+                    borderRadius: 2,
+                    p: 2,
+                    background: "rgba(2, 6, 23, 0.25)",
+                  }}
+                >
+                  <Box
+                    component="label"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      border: `1px dashed ${border}`,
+                      backgroundColor: "rgba(2, 6, 23, 0.25)",
+                      cursor: "pointer",
+                      "&:hover": {
+                        borderColor: "rgba(34,211,238,0.35)",
+                        backgroundColor: "rgba(34,211,238,0.06)",
+                      },
+                    }}
+                  >
+                    <Typography
+                      sx={{ fontSize: 13, color: "rgba(255,255,255,0.88)" }}
+                    >
+                      {mainImage ? mainImage.name : "Choose an image…"}
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        px: 1.2,
+                        py: 0.6,
+                        borderRadius: 2,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: "rgba(255,255,255,0.92)",
+                        background: `linear-gradient(90deg, rgba(34,211,238,0.28), rgba(99,102,241,0.22))`,
+                        border: "1px solid rgba(34,211,238,0.25)",
+                      }}
+                    >
+                      Browse
+                    </Box>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleMainImageChange}
+                      style={{ display: "none" }}
+                    />
+                  </Box>
+
+                  {serverMainImage?.secure_url && !mainImagePreview && (
+                    <Box
+                      mt={1}
+                      sx={{ width: 120, height: 120, ...imageFrameSx }}
+                    >
+                      <img
+                        src={serverMainImage.secure_url}
+                        alt="Server Main"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Box>
+                  )}
+
+                  {mainImagePreview && (
+                    <Box
+                      mt={1}
+                      sx={{
+                        position: "relative",
+                        width: 120,
+                        height: 120,
+                        ...imageFrameSx,
+                      }}
+                    >
+                      <img
+                        src={mainImagePreview}
+                        alt="New Main Preview"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <Box
+                        onClick={removeNewMainImage}
+                        sx={{
+                          position: "absolute",
+                          top: -6,
+                          right: -6,
+                          width: 22,
+                          height: 22,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 14,
+                          cursor: "pointer",
+                          ...dangerChipSx,
+                        }}
+                      >
+                        ✕
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
+              <Box mt={2}>
+                <Typography
+                  sx={{
+                    fontSize: 12,
+                    color: "rgba(226,232,240,0.75)",
+                    fontWeight: 800,
+                    letterSpacing: 0.2,
+                    mb: 1,
+                  }}
+                >
+                  Sub Images
+                </Typography>
+
+                <Box
+                  mt={1}
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    opacity: isDeleting ? 0.6 : 1,
+                    pointerEvents: isDeleting ? "none" : "auto",
+                  }}
+                >
+                  {serverSubImages.map((img) => (
+                    <Box
+                      key={img.public_id}
+                      sx={{
+                        position: "relative",
+                        width: 90,
+                        height: 90,
+                        ...imageFrameSx,
+                      }}
+                    >
+                      <img
+                        src={img.secure_url}
+                        alt="Server Sub"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <Box
+                        onClick={() => removeServerSubImage(img.public_id)}
+                        sx={{
+                          position: "absolute",
+                          top: 2,
+                          right: 2,
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 12,
+                          cursor: "pointer",
+                          lineHeight: 1,
+                          ...dangerChipSx,
+                        }}
+                      >
+                        ✕
+                      </Box>
+                    </Box>
+                  ))}
+
+                  {subImagesPreview.map((src, idx) => (
+                    <Box
+                      key={`new-${idx}`}
+                      sx={{
+                        position: "relative",
+                        width: 90,
+                        height: 90,
+                        ...imageFrameSx,
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt={`New Sub ${idx}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <Box
+                        onClick={() => removeNewSubImage(idx)}
+                        sx={{
+                          position: "absolute",
+                          top: 2,
+                          right: 2,
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 12,
+                          cursor: "pointer",
+                          lineHeight: 1,
+                          ...dangerChipSx,
+                        }}
+                      >
+                        ✕
+                      </Box>
+                    </Box>
+                  ))}
+
+                  <Box
+                    onClick={() => subImageInputRef.current?.click()}
+                    sx={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: 2,
+                      border: `2px dashed ${border}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      color: "rgba(226,232,240,0.7)",
+                      fontSize: 32,
+                      backgroundColor: "rgba(2, 6, 23, 0.18)",
+                      "&:hover": {
+                        borderColor: "rgba(34,211,238,0.55)",
+                        color: accent,
+                        backgroundColor: "rgba(34,211,238,0.06)",
+                      },
+                    }}
+                  >
+                    +
+                  </Box>
+                </Box>
+              </Box>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, ...primaryBtnSx }}
+              >
+                Update Product
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Box mt={4} sx={{color:"white"}}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 800 }}>
+            Product Reviews
+          </Typography>
+
+          <Card sx={{ ...glassCardSx, mt: 1 ,color:"white" }}>
+            <CardContent sx={{ p: { xs: 2, md: 3,color:"white" } }}>
+              {product?._id && <ProductReviewsList productId={product._id} />}
+            </CardContent>
+          </Card>
+        </Box>
       </Box>
     </Box>
   );

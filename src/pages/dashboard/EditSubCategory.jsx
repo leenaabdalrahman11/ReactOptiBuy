@@ -58,8 +58,7 @@ export default function EditSubCategory() {
         categoryId: subCategory.category || "",
         isActive: !!subCategory.isActive,
       });
-      if (subCategory.image?.secure_url)
-        setPreview(subCategory.image.secure_url);
+      if (subCategory.image?.secure_url) setPreview(subCategory.image.secure_url);
     }
   }, [subCategory]);
 
@@ -139,90 +138,267 @@ export default function EditSubCategory() {
     }
   };
 
-  if (loadingSub || loadingCats) return <CircularProgress />;
+  const accent = "#22d3ee";
+  const bg = "#070B12";
+  const panel = "rgba(15, 23, 42, 0.55)";
+  const border = "rgba(148, 163, 184, 0.12)";
+  const grid = "rgba(148, 163, 184, 0.08)";
+
+  const glassCardSx = {
+    background: `linear-gradient(180deg, ${panel} 0%, rgba(15, 23, 42, 0.35) 100%)`,
+    border: `1px solid ${border}`,
+    boxShadow: "0 18px 60px rgba(0,0,0,0.55)",
+    borderRadius: 3,
+    backdropFilter: "blur(10px)",
+  };
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      color: "rgba(255,255,255,0.92)",
+      borderRadius: 2,
+      backgroundColor: "rgba(2, 6, 23, 0.35)",
+      "& fieldset": { borderColor: border },
+      "&:hover fieldset": { borderColor: "rgba(34, 211, 238, 0.35)" },
+      "&.Mui-focused fieldset": { borderColor: accent },
+    },
+    "& .MuiInputLabel-root": { color: "rgba(226,232,240,0.72)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: accent },
+    "& .MuiFormHelperText-root": { color: "rgba(226,232,240,0.6)" },
+  };
+
+  const menuPaperSx = {
+    mt: 1,
+    backgroundColor: "rgba(2,6,23,0.95)",
+    border: `1px solid ${border}`,
+    color: "rgba(255,255,255,0.9)",
+    "& .MuiMenuItem-root": {
+      fontSize: 14,
+      "&.Mui-selected": { backgroundColor: "rgba(34,211,238,0.18)" },
+      "&.Mui-selected:hover": { backgroundColor: "rgba(34,211,238,0.24)" },
+    },
+  };
+
+  const primaryBtnSx = {
+    borderRadius: 2,
+    fontWeight: 800,
+    textTransform: "none",
+    background: `linear-gradient(90deg, ${accent} 0%, rgba(99,102,241,0.95) 100%)`,
+    boxShadow: "0 12px 30px rgba(34,211,238,0.18)",
+    "&:hover": {
+      background: `linear-gradient(90deg, rgba(34,211,238,0.95) 0%, rgba(99,102,241,0.9) 100%)`,
+    },
+    "&.Mui-disabled": {
+      background: "rgba(148,163,184,0.20)",
+      color: "rgba(255,255,255,0.55)",
+    },
+  };
+
+  const outlineBtnSx = {
+    borderRadius: 2,
+    fontWeight: 800,
+    textTransform: "none",
+    color: "rgba(255,255,255,0.86)",
+    borderColor: "rgba(148, 163, 184, 0.25)",
+    backgroundColor: "rgba(2, 6, 23, 0.10)",
+    "&:hover": {
+      borderColor: "rgba(34,211,238,0.45)",
+      backgroundColor: "rgba(34,211,238,0.06)",
+    },
+  };
+
+  const switchSx = {
+    "& .MuiSwitch-switchBase.Mui-checked": { color: accent },
+    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+      backgroundColor: "rgba(34,211,238,0.55)",
+    },
+    "& .MuiSwitch-track": { backgroundColor: "rgba(148,163,184,0.25)" },
+  };
+
+  if (loadingSub || loadingCats)
+    return (
+      <Box
+        sx={{
+          minHeight: "calc(100vh - 64px)",
+          display: "grid",
+          placeItems: "center",
+          background: `radial-gradient(900px 500px at 20% 10%, rgba(34,211,238,0.12) 0%, transparent 60%),
+                       radial-gradient(900px 500px at 80% 20%, rgba(99,102,241,0.10) 0%, transparent 55%),
+                       linear-gradient(180deg, ${bg} 0%, #05070D 100%)`,
+        }}
+      >
+        <CircularProgress sx={{ color: accent }} />
+      </Box>
+    );
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
-        Edit SubCategory
-      </Typography>
+    <Box
+      sx={{
+        minHeight: "calc(100vh - 64px)",
+        px: { xs: 2, md: 3 },
+        py: { xs: 2, md: 3 },
+        color: "white",
+        background: `radial-gradient(900px 500px at 20% 10%, rgba(34,211,238,0.12) 0%, transparent 60%),
+                     radial-gradient(900px 500px at 80% 20%, rgba(99,102,241,0.10) 0%, transparent 55%),
+                     linear-gradient(180deg, ${bg} 0%, #05070D 100%)`,
+        position: "relative",
+        "&:before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `
+            linear-gradient(${grid} 1px, transparent 1px),
+            linear-gradient(90deg, ${grid} 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          opacity: 0.5,
+          pointerEvents: "none",
+        },
+      }}
+    >
+      <Box sx={{ position: "relative", zIndex: 1, maxWidth: 980, mx: "auto" }}>
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <Box>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: 800, letterSpacing: 0.2, lineHeight: 1.1 }}
+            >
+              Edit SubCategory
+            </Typography>
+            <Typography sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}>
+              Update subcategory details and image.
+            </Typography>
+          </Box>
 
-      <Card>
-        <CardContent>
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
-            <Stack spacing={2}>
-              <TextField
-                label="Name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
+          <Button variant="outlined" onClick={() => navigate(-1)} sx={outlineBtnSx}>
+            Back
+          </Button>
+        </Box>
 
-              <TextField
-                select
-                label="Category"
-                name="categoryId"
-                value={form.categoryId}
-                onChange={handleChange}
-                helperText={
-                  form.categoryId ? "" : "SubCategory not linked to a category"
-                }
-              >
-                <MenuItem value="">-- No Category --</MenuItem>
-                {Array.isArray(categories) &&
-                  categories.map((cat) => (
-                    <MenuItem key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </MenuItem>
-                  ))}
-              </TextField>
+        <Card sx={glassCardSx}>
+          <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+            <form onSubmit={handleSubmit} encType="multipart/form-data">
+              <Stack spacing={2}>
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  sx={fieldSx}
+                />
 
-              <Box>
-                <Typography variant="subtitle2">Image</Typography>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  {preview ? (
-                    <Avatar
-                      src={preview}
-                      alt="preview"
-                      sx={{ width: 56, height: 56 }}
-                    />
-                  ) : (
-                    <Avatar sx={{ width: 56, height: 56 }}>
-                      {form.name?.[0]}
-                    </Avatar>
-                  )}
-                  <Button variant="outlined" component="label">
-                    Choose Image
-                    <input
-                      hidden
-                      accept="image/*"
-                      type="file"
-                      onChange={handleFile}
-                    />
+                <TextField
+                  select
+                  label="Category"
+                  name="categoryId"
+                  value={form.categoryId}
+                  onChange={handleChange}
+                  helperText={
+                    form.categoryId ? "" : "SubCategory not linked to a category"
+                  }
+                  fullWidth
+                  sx={fieldSx}
+                  SelectProps={{
+                    MenuProps: { PaperProps: { sx: menuPaperSx } },
+                  }}
+                >
+                  <MenuItem value="">-- No Category --</MenuItem>
+                  {Array.isArray(categories) &&
+                    categories.map((cat) => (
+                      <MenuItem key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
+                </TextField>
+
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: "rgba(226,232,240,0.75)",
+                      fontWeight: 800,
+                      letterSpacing: 0.2,
+                      mb: 1,
+                    }}
+                  >
+                    Image
+                  </Typography>
+
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    {preview ? (
+                      <Avatar
+                        src={preview}
+                        alt="preview"
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          border: "1px solid rgba(34,211,238,0.22)",
+                          boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
+                        }}
+                      />
+                    ) : (
+                      <Avatar
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          background:
+                            "linear-gradient(90deg, rgba(34,211,238,0.35), rgba(99,102,241,0.30))",
+                          border: "1px solid rgba(34,211,238,0.22)",
+                          color: "rgba(255,255,255,0.92)",
+                          fontWeight: 900,
+                        }}
+                      >
+                        {form.name?.[0]}
+                      </Avatar>
+                    )}
+
+                    <Button variant="outlined" component="label" sx={outlineBtnSx}>
+                      Choose Image
+                      <input hidden accept="image/*" type="file" onChange={handleFile} />
+                    </Button>
+                  </Stack>
+                </Box>
+
+                <FormControlLabel
+                  control={<Switch checked={form.isActive} onChange={handleToggle} sx={switchSx} />}
+                  label={
+                    <Typography sx={{ color: "rgba(226,232,240,0.8)", fontWeight: 800 }}>
+                      {form.isActive ? "Active" : "Inactive"}
+                    </Typography>
+                  }
+                />
+
+                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 1 }}>
+                  <Button type="submit" variant="contained" disabled={saving} sx={{ minWidth: 160, ...primaryBtnSx }}>
+                    {saving ? (
+                      <CircularProgress
+                        size={20}
+                        sx={{ color: "white", "& .MuiCircularProgress-circle": { strokeLinecap: "round" } }}
+                      />
+                    ) : (
+                      "Save"
+                    )}
                   </Button>
-                </Stack>
-              </Box>
 
-              <FormControlLabel
-                control={
-                  <Switch checked={form.isActive} onChange={handleToggle} />
-                }
-                label={form.isActive ? "Active" : "Inactive"}
-              />
-
-              <Box>
-                <Button type="submit" variant="contained" disabled={saving}>
-                  {saving ? <CircularProgress size={20} /> : "Save"}
-                </Button>
-                <Button sx={{ ml: 2 }} onClick={() => navigate(-1)}>
-                  Cancel
-                </Button>
-              </Box>
-            </Stack>
-          </form>
-        </CardContent>
-      </Card>
+                  <Button onClick={() => navigate(-1)} variant="outlined" sx={{ minWidth: 140, ...outlineBtnSx }}>
+                    Cancel
+                  </Button>
+                </Box>
+              </Stack>
+            </form>
+          </CardContent>
+        </Card>
+      </Box>
     </Box>
   );
 }

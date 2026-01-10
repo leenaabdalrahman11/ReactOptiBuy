@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   TextField,
@@ -9,131 +9,151 @@ import {
   CircularProgress,
   Typography,
   Box,
-  Divider
+  InputAdornment,
 } from "@mui/material";
-import CategoryIcon from "@mui/icons-material/Category";
-import InventoryIcon from "@mui/icons-material/Inventory2";
+import SearchIcon from "@mui/icons-material/Search";
 import AxiosInstance from "../../api/AxiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchOverlay() {
+  const navigate = useNavigate();
+
   const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(query.trim()), 250);
+    return () => clearTimeout(t);
+  }, [query]);
 
   const searchApi = async ({ queryKey }) => {
     const [_key, q] = queryKey;
-    if (!q || q.trim() === "") return { categories: [], products: [] };
+    if (!q) return { products: [] };
 
-    try {
-      const { data } = await AxiosInstance.get(
-        `/search?q=${encodeURIComponent(q)}`
-      );
-      return data;
-    } catch (error) {
-      console.error("Search API error:", error);
-      throw new Error("Failed to fetch search results");
+    const { data } = await AxiosInstance.get(`/search?q=${encodeURIComponent(q)}`);
+
+    const products = (data?.products || []).map((p) => ({
+      _id: p._id,
+      name: p.name,
+    }));
+
+    const uniq = [];
+    const seen = new Set();
+    for (const p of products) {
+      const key = (p.name || "").toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniq.push(p);
+      }
     }
+
+    return { products: uniq };
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["search", query],
+    queryKey: ["search-suggest", debounced],
     queryFn: searchApi,
-    enabled: !!query,
-    staleTime: 30_000
+    enabled: debounced.length > 0,
+    staleTime: 30_000,
   });
 
-  const categories = data?.categories || [];
   const products = data?.products || [];
+  const showDropdown = open && debounced.length > 0 && products.length > 0;
+
+const goToFilteredProducts = (q) => {
+  const cleaned = (q || "").trim();
+  if (!cleaned) return;
+
+  setOpen(false);
+  navigate(`/products-page?search=${encodeURIComponent(cleaned)}&page=1&limit=10`);
+};
+
 
   return (
-    <Box
-      sx={{
-        position: "relative", 
-        width: "40%",
-        bgcolor: "background.paper",
-        zIndex: 1300,
-        mx: "auto",         
-      }}
-    >
+    <Box sx={{ position: "relative", width: "100%", maxWidth: 520 }}>
       <TextField
         fullWidth
-        size="medium"
-        label="Search for any products"
+        placeholder="Search products..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => {
+          setTimeout(() => setOpen(false), 150);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            goToFilteredProducts(query);
+          }
+        }}
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              {isLoading ? <CircularProgress size={18} /> : null}
+            </InputAdornment>
+          ),
+          sx: {
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 1,
+          },
+        }}
       />
 
-      {isLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-          <CircularProgress size={24} />
-        </Box>
-      )}
-
-      {(categories.length > 0 || products.length > 0) && (
+      {showDropdown && (
         <Paper
+          elevation={6}
           sx={{
-            mt: 0,   
-            p: 1,
-            position: "absolute", 
-            width: "100%",
-            boxShadow: 3,
-            maxHeight: 400,
-            overflowY: "auto",
+            position: "absolute",
+            top: "calc(100% + 8px)",
+            left: 0,
+            right: 0,
+            borderRadius: 2,
+            overflow: "hidden",
+            zIndex: 1400,
           }}
         >
-          {categories.length > 0 && (
-            <>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Categories
-              </Typography>
-              <List dense>
-                {categories.map((cat) => (
-                  <ListItemButton
-                    key={cat._id}
-                    component="a"
-                    href={`/category-details/${cat._id}`}
-                  >
-                    <CategoryIcon sx={{ mr: 1 }} />
-                    <ListItemText primary={cat.name} />
-                  </ListItemButton>
-                ))}
-              </List>
-            </>
-          )}
-
-          {categories.length > 0 && products.length > 0 && <Divider sx={{ my: 1 }} />}
-
-          {products.length > 0 && (
-            <>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Products
-              </Typography>
-              <List dense>
-                {products.map((prod) => (
-                  <ListItemButton
-                    key={prod._id}
-                    component="a"
-                    href={`/product-details/${prod._id}`}
-                  >
-                    <InventoryIcon sx={{ mr: 1 }} />
-                    <ListItemText
-                      primary={prod.name}
-                      secondary={prod.description}
-                    />
-                  </ListItemButton>
-                ))}
-              </List>
-            </>
-          )}
+          <Box sx={{ maxHeight: 320, overflowY: "auto" }}>
+            <List disablePadding>
+              {products.map((prod) => (
+                <ListItemButton
+                  key={prod._id}
+                  onMouseDown={(e) => e.preventDefault()} 
+                  onClick={() => {
+                    setQuery(prod.name); 
+                    goToFilteredProducts(prod.name);
+                  }}
+                  sx={{ px: 2, py: 1.2 }}
+                >
+                  <ListItemText
+                    primary={prod.name}
+                    primaryTypographyProps={{ noWrap: true, fontWeight: 700 }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Box>
         </Paper>
       )}
 
-      {!isLoading && query && categories.length === 0 && products.length === 0 && (
-        <Typography sx={{ mt: 1 }} color="text.secondary">
-          No results found
+      {!isLoading && debounced && open && products.length === 0 && !isError && (
+        <Typography sx={{ mt: 1, fontSize: 13 }} color="text.secondary">
+          No suggestions
         </Typography>
       )}
 
       {isError && (
-        <Typography color="error" sx={{ mt: 1 }}>
+        <Typography color="error" sx={{ mt: 1, fontSize: 13 }}>
           Search failed
         </Typography>
       )}

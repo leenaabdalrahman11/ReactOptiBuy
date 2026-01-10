@@ -1,0 +1,56 @@
+{
+  "navbar": {
+    "menu": "Menu",
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "profile": "Profile",
+    "myOrders": "My Orders",
+    "adminDashboard": "Admin Dashboard",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Log Out"
+  },
+    "products": {
+    "bestSelling": "Best Selling Products",
+    "loadingRatings": "Loading ratings...",
+    "errorLoadingRatings": "Error loading ratings",
+    "errorWithMessage": "Error: {{message}}"
+  },
+  "whyChooseUs": {
+    "title": "Why Choose Us",
+    "subtitle": "We deliver quality, value, and variety you can trust.",
+    "cards": {
+      "quality": {
+        "title": "Luxury Quality",
+        "text": "Premium-quality products crafted with care, style, and attention to detail."
+      },
+      "price": {
+        "title": "Affordable Prices",
+        "text": "Competitive pricing that delivers real value without compromise."
+      },
+      "variety": {
+        "title": "Wide Variety",
+        "text": "Thousands of products across multiple categories in one place."
+      }
+    }
+  },
+  "home": {
+    "welcome": "Welcome to OptiBuy",
+    "welcomeUser": "Welcome {{name}} to OptiBuy",
+    "subtitle": "Your one-stop shop for quality products"
+  },
+    "common": {
+    "noImage": "No image uploaded",
+    "anonymous": "Anonymous",
+    "sectionImageAlt": "section image"
+  },
+    "reviews": {
+    "kicker": "TESTIMONIALS",
+    "title": "Our Client Reviews",
+    "viewProduct": "View Product Details",
+    "customer": "Customer"
+  }
+
+
+}

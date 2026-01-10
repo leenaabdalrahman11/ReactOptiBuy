@@ -21,7 +21,7 @@ AxiosSessionInstance.interceptors.request.use((config) => {
 
   config.headers["x-session-id"] = sessionId;
 
-  if (token) config.headers.Authorization = `Leena ${token}`;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
 
   return config;
 });

@@ -6,3 +6,22 @@
 a{
     text-decoration: none;
 }
+.MuiDrawer-paper {
+  background-color: #433f3f !important;
+  color: #fff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  padding-top: 2%;
+  z-index: 9999999999999999999999999999999999 !important;
+}
+
+:root {
+  --main-color: #ffffff;
+  --sub-color: #be6913;
+}
+body {
+    font-family: "Yellowtail", cursive;
+  background-color: #ffffff !important;
+  margin: 0;
+  padding: 0;
+}

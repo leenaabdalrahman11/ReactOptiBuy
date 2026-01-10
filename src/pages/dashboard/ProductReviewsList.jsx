@@ -51,18 +51,19 @@ export default function ProductReviewsList({ productId }) {
   if (isLoading) return <CircularProgress />;
 
   return (
-    <Box>
+    <Box sx={{color:"white"}}>
       <Typography variant="h6" gutterBottom>
         Reviews ({reviews.length})
       </Typography>
 
       {reviews.length === 0 ? (
-        <Typography variant="body2">No reviews for this product.</Typography>
+        <Typography sx={{color:"white"}} variant="body2">No reviews for this product.</Typography>
       ) : (
-        <List>
+        <List sx={{color:"white"}}>
           {reviews.map((r) => (
             <React.Fragment key={r._id}>
               <ListItem
+              sx={{color:"white"}}
                 alignItems="flex-start"
                 secondaryAction={
                   <Tooltip title="Delete review">
@@ -76,6 +77,8 @@ export default function ProductReviewsList({ productId }) {
                   <Avatar>{r.createdBy?.userName?.[0] ?? "U"}</Avatar>
                 </ListItemAvatar>
                 <ListItemText
+                
+                sx={{color:"white"}}
                   primary={
                     <>
                       <strong>
@@ -84,29 +87,35 @@ export default function ProductReviewsList({ productId }) {
                       <Typography
                         component="span"
                         variant="caption"
-                        color="text.secondary"
+                      sx={{color:"white"}}
+
                       >
                         {r.createdBy?.email ? ` — ${r.createdBy.email}` : ""}
                       </Typography>
                     </>
                   }
+                  
                   secondary={
                     <>
+                    <Box sx={{color:"white"}}>
                       <Typography
                         component="span"
                         variant="body2"
-                        color="text.primary"
+                      sx={{color:"white"}}
+
                       >
                         {`Rating: ${r.rating ?? "-"}`}
                       </Typography>
                       <br />
-                      <span>{r.comment}</span>
+                      <span >{r.comment}</span>
                       <br />
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" color="">
                         {r.createdAt
                           ? format(new Date(r.createdAt), "PPpp")
                           : ""}
                       </Typography>
+                    </Box>
+
                     </>
                   }
                 />
