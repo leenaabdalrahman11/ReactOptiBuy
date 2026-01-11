@@ -20,7 +20,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 
 const getSessionId = () => {
   let sid = localStorage.getItem("sessionId");
@@ -81,9 +82,7 @@ const handlePhoneChange = (e) => {
         return response.data;
       }
 
-      const response = await axios.get(`${BACKEND_URL}/cart`, {
-        headers: { "x-session-id": currentSessionId },
-      });
+      const response = await AxiosUserInstance.get("/cart");
       return response.data;
     },
     retry: false,
@@ -115,9 +114,7 @@ const handlePhoneChange = (e) => {
       };
 
       try {
-        const response = await axios.post(`${BACKEND_URL}/order`, payload, {
-          headers,
-        });
+        const response = await AxiosUserInstance.post("/order", payload);
         return response.data;
       } catch (error) {
         console.error("❌ Order API error:");
