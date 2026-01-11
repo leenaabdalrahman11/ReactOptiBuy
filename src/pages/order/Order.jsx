@@ -78,7 +78,7 @@ const handlePhoneChange = (e) => {
           Authorization: `Bearer ${currentToken}`,
           "x-session-id": currentSessionId,
         };
-        const response = await axios.get(`${BACKEND_URL}/cart`, { headers });
+        const response = await AxiosUserInstance.get("/cart");
         return response.data;
       }
 
