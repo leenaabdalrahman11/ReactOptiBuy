@@ -13,6 +13,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import { Chip } from "@mui/material";
 
 export default function CreateProduct() {
   const navigate = useNavigate();
@@ -113,7 +114,10 @@ export default function CreateProduct() {
   };
 
   const handleTagsChange = (_, newValue) => {
-    setFormData((p) => ({ ...p, tags: newValue }));
+    const unique = Array.from(
+      new Set(newValue.map((t) => String(t).trim()))
+    ).filter(Boolean);
+    setFormData((p) => ({ ...p, tags: unique }));
   };
 
   const handleMainImageChange = (e) => {
@@ -263,13 +267,38 @@ export default function CreateProduct() {
                 options={[]}
                 value={formData.tags}
                 onChange={handleTagsChange}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option}
+                      {...getTagProps({ index })}
+                      sx={{
+                        backgroundColor: "rgba(255,255,255,0.12)",
+                        color: "#fff",
+                        border: "1px solid rgba(255,255,255,0.35)",
+                        fontWeight: 700,
+                        "& .MuiChip-deleteIcon": {
+                          color: "rgba(255,255,255,0.75)",
+                          "&:hover": { color: "#fff" },
+                        },
+                      }}
+                    />
+                  ))
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="Tags"
                     fullWidth
                     margin="normal"
-                    sx={fieldSx}
+                    placeholder="Type tag and press Enter"
+                    sx={{
+                      ...fieldSx,
+                      "& .MuiOutlinedInput-root": {
+                        ...fieldSx["& .MuiOutlinedInput-root"],
+                        "& input": { color: "#fff" },
+                      },
+                    }}
                   />
                 )}
               />

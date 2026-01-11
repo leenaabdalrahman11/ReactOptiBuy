@@ -123,6 +123,27 @@ export default function DashboardHomeTag() {
     });
     setMsg(`Saved! Home tag = ${data.settings.homeProductsTag}`);
   };
+  const saveAll = async () => {
+    setMsg("");
+    try {
+      const cleanTag = tag.trim().toLowerCase();
+
+      const { data } = await AxiosUserInstance.put("/settings", {
+        homeProductsTag: cleanTag,
+      });
+
+      localStorage.setItem("season_title", title);
+
+      setMsg(
+        `Saved successfully! 
+Home tag = ${data.settings.homeProductsTag}
+Title = ${title}`
+      );
+    } catch (err) {
+      console.error(err);
+      setMsg("Failed to save settings");
+    }
+  };
 
   return (
     <Box
@@ -157,8 +178,11 @@ export default function DashboardHomeTag() {
           >
             Home Products Tag
           </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}>
-            Choose a tag for the home products section, and set the section title.
+          <Typography
+            sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}
+          >
+            Choose a tag for the home products section, and set the section
+            title.
           </Typography>
         </Box>
 
@@ -205,12 +229,6 @@ export default function DashboardHomeTag() {
                   )}
                 />
 
-                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 2 }}>
-                  <Button variant="contained" onClick={save} sx={primaryBtnSx}>
-                    Save Tag
-                  </Button>
-                </Box>
-
                 <Box sx={{ mt: 3, pt: 3, borderTop: `1px solid ${border}` }}>
                   <Typography
                     sx={{
@@ -232,12 +250,15 @@ export default function DashboardHomeTag() {
                     sx={fieldSx}
                   />
 
-                  <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 2 }}>
-                    <Button variant="contained" onClick={saveTitle} sx={primaryBtnSx}>
-                      Save Title
-                    </Button>
-                    <Button variant="outlined" onClick={() => setTitle("Seasonal Offers")} sx={outlineBtnSx}>
-                      Reset
+                  <Box
+                    sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 2 }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={saveAll}
+                      sx={{ ...primaryBtnSx, mt: 2 }}
+                    >
+                      Save Home Section
                     </Button>
                   </Box>
                 </Box>

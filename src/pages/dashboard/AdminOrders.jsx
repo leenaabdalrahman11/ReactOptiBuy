@@ -50,7 +50,14 @@ export default function AdminOrders() {
     }
   };
 
-  const STATUSES = ["pending", "processing", "confirmed", "delivered", "cancelled"];
+  const STATUSES = [
+    "pending",
+    "processing",
+    "confirmed",
+    "delivered",
+    "received",
+    "cancelled",
+  ];
 
   const accent = "#22d3ee";
   const bg = "#070B12";
@@ -122,13 +129,42 @@ export default function AdminOrders() {
 
   const statusPillSx = (status) => {
     const map = {
-      pending: { c: "rgba(234,179,8,0.95)", b: "rgba(234,179,8,0.24)", bg: "rgba(234,179,8,0.10)" },
-      processing: { c: "rgba(59,130,246,0.95)", b: "rgba(59,130,246,0.24)", bg: "rgba(59,130,246,0.10)" },
-      shipped: { c: "rgba(168,85,247,0.95)", b: "rgba(168,85,247,0.24)", bg: "rgba(168,85,247,0.10)" },
-      delivered: { c: "rgba(34,197,94,0.95)", b: "rgba(34,197,94,0.24)", bg: "rgba(34,197,94,0.10)" },
-      cancelled: { c: "rgba(239,68,68,0.95)", b: "rgba(239,68,68,0.24)", bg: "rgba(239,68,68,0.10)" },
+      pending: {
+        c: "rgba(234,179,8,0.95)",
+        b: "rgba(234,179,8,0.24)",
+        bg: "rgba(234,179,8,0.10)",
+      },
+      processing: {
+        c: "rgba(59,130,246,0.95)",
+        b: "rgba(59,130,246,0.24)",
+        bg: "rgba(59,130,246,0.10)",
+      },
+      shipped: {
+        c: "rgba(168,85,247,0.95)",
+        b: "rgba(168,85,247,0.24)",
+        bg: "rgba(168,85,247,0.10)",
+      },
+      delivered: {
+        c: "rgba(34,197,94,0.95)",
+        b: "rgba(34,197,94,0.24)",
+        bg: "rgba(34,197,94,0.10)",
+      },
+      cancelled: {
+        c: "rgba(239,68,68,0.95)",
+        b: "rgba(239,68,68,0.24)",
+        bg: "rgba(239,68,68,0.10)",
+      },
+      received: {
+        c: "rgba(16,185,129,0.95)",
+        b: "rgba(16,185,129,0.24)",
+        bg: "rgba(16,185,129,0.10)",
+      },
     };
-    const t = map[status] || { c: "rgba(226,232,240,0.8)", b: border, bg: "rgba(2,6,23,0.15)" };
+    const t = map[status] || {
+      c: "rgba(226,232,240,0.8)",
+      b: border,
+      bg: "rgba(2,6,23,0.15)",
+    };
     return {
       display: "inline-flex",
       alignItems: "center",
@@ -189,12 +225,18 @@ export default function AdminOrders() {
             >
               Orders — Admin Status
             </Typography>
-            <Typography sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}>
+            <Typography
+              sx={{ mt: 0.5, fontSize: 13, color: "rgba(226,232,240,0.7)" }}
+            >
               Filter orders by status and update them quickly.
             </Typography>
           </Box>
 
-          <Button variant="contained" onClick={() => refetch()} sx={primaryBtnSx}>
+          <Button
+            variant="contained"
+            onClick={() => refetch()}
+            sx={primaryBtnSx}
+          >
             Refresh
           </Button>
         </Box>
@@ -243,6 +285,7 @@ export default function AdminOrders() {
                       <TableCell>Total</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Change Status</TableCell>
+                      <TableCell>User Confirmed</TableCell>
                     </TableRow>
                   </TableHead>
 
@@ -253,7 +296,12 @@ export default function AdminOrders() {
                           {order.userId?.userName || "Unknown"}
                         </TableCell>
 
-                        <TableCell sx={{ color: "rgba(226,232,240,0.85)", fontWeight: 800 }}>
+                        <TableCell
+                          sx={{
+                            color: "rgba(226,232,240,0.85)",
+                            fontWeight: 800,
+                          }}
+                        >
                           {order.finalPrice} ₪
                         </TableCell>
 
@@ -264,23 +312,40 @@ export default function AdminOrders() {
                         </TableCell>
 
                         <TableCell>
-                          {STATUSES.filter((s) => s !== order.status).map((s) => (
-                            <Button
-                              key={s}
-                              size="small"
-                              variant="outlined"
-                              onClick={() => handleChangeStatus(order._id, s)}
-                              sx={{
-                                ...outlineBtnSx,
-                                mr: 1,
-                                mb: 1,
-                                fontSize: 12,
-                                py: 0.5,
-                              }}
-                            >
-                              {s.charAt(0).toUpperCase() + s.slice(1)}
-                            </Button>
-                          ))}
+                          {STATUSES.filter((s) => s !== order.status).map(
+                            (s) => (
+                              <Button
+                                key={s}
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleChangeStatus(order._id, s)}
+                                sx={{
+                                  ...outlineBtnSx,
+                                  mr: 1,
+                                  mb: 1,
+                                  fontSize: 12,
+                                  py: 0.5,
+                                }}
+                              >
+                                {s.charAt(0).toUpperCase() + s.slice(1)}
+                              </Button>
+                            )
+                          )}
+                        </TableCell>
+
+                        <TableCell
+                          sx={{
+                            color: "rgba(226,232,240,0.85)",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {order.receivedByUser
+                            ? `Yes — ${
+                                order.receivedAt
+                                  ? new Date(order.receivedAt).toLocaleString()
+                                  : ""
+                              }`
+                            : "No"}
                         </TableCell>
                       </TableRow>
                     ))}

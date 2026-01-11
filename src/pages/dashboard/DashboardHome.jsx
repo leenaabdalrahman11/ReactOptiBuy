@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   Typography,
+  Button,
   Grid,
   CircularProgress,
   Select,
@@ -43,7 +44,11 @@ import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
 import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-
+import { TextField, IconButton } from "@mui/material";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import SaveRoundedIcon from "@mui/icons-material/SaveRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 function KpiCard({ title, value, hint, icon, accent = "#7c3aed" }) {
   return (
     <Card
@@ -135,6 +140,7 @@ function DarkTooltip({ active, payload, label }) {
 
 export default function DashboardHomeV2() {
   const [range, setRange] = useState("year");
+  const queryClient = useQueryClient();
 
   const fetchOverview = async () => {
     const { data } = await AxiosUserInstance.get(
@@ -149,12 +155,78 @@ export default function DashboardHomeV2() {
     refetchOnWindowFocus: false,
   });
 
+  const monthlyTarget = overview?.monthlyTarget ?? null;
+
+  const monthKey = React.useMemo(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }, []);
+
+  const [isEditingTarget, setIsEditingTarget] = useState(false);
+  const [targetInput, setTargetInput] = useState("");
+
+  React.useEffect(() => {
+    if (monthlyTarget?.target != null) {
+      setTargetInput(String(monthlyTarget.target));
+    }
+  }, [monthlyTarget?.target]);
+
+  const updateTargetMutation = useMutation({
+    mutationFn: async () => {
+      const t = Number(targetInput);
+      if (!Number.isFinite(t) || t < 0) throw new Error("Invalid target");
+
+      const { data } = await AxiosUserInstance.put("/dashboard/target", {
+        monthKey,
+        target: t,
+      });
+      return data;
+    },
+    onSuccess: async () => {
+      setIsEditingTarget(false);
+
+      await queryClient.invalidateQueries({
+        queryKey: ["dash-overview"],
+        exact: false,
+      });
+    },
+    onError: (err) => {
+      console.log("UPDATE TARGET ERROR:", err);
+      alert(err?.response?.data?.message || err.message);
+    },
+  });
+
   const fetchSales = async () => {
     const { data } = await AxiosUserInstance.get(
       `/dashboard/orders/sales?range=${range}`
     );
     return data.salesData ?? [];
   };
+  const fetchTopFound = async () => {
+    const { data } = await AxiosUserInstance.get(
+      `/dashboard/analytics/top-found?limit=10`
+    );
+    return data.rows || [];
+  };
+
+  const fetchTopNotFound = async () => {
+    const { data } = await AxiosUserInstance.get(
+      `/dashboard/analytics/top-not-found?limit=10`
+    );
+    return data.rows || [];
+  };
+
+  const { data: topFound = [], isLoading: foundLoading } = useQuery({
+    queryKey: ["dash-top-found"],
+    queryFn: fetchTopFound,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: topNotFound = [], isLoading: notFoundLoading } = useQuery({
+    queryKey: ["dash-top-not-found"],
+    queryFn: fetchTopNotFound,
+    refetchOnWindowFocus: false,
+  });
 
   const { data: salesData = [], isLoading: salesLoading } = useQuery({
     queryKey: ["dash-sales", range],
@@ -164,7 +236,6 @@ export default function DashboardHomeV2() {
 
   const kpis = overview?.kpis ?? {};
   const recentOrders = overview?.recentOrders ?? [];
-  const monthlyTarget = overview?.monthlyTarget ?? null;
 
   const topCategories =
     (overview?.topCategories ?? []).map((x) => ({
@@ -172,11 +243,13 @@ export default function DashboardHomeV2() {
       value: x.sales,
     })) ?? [];
 
-
   const xKey = range === "year" ? "month" : range === "month" ? "date" : "day";
 
   const statusData = useMemo(() => {
-    const normalize = (s) => String(s || "").toLowerCase().trim();
+    const normalize = (s) =>
+      String(s || "")
+        .toLowerCase()
+        .trim();
     let active = 0,
       complete = 0,
       hold = 0;
@@ -215,7 +288,7 @@ export default function DashboardHomeV2() {
         bgcolor: "#070b14",
         color: "#e5e7eb",
         paddingTop: "1%",
-        px: { xs: 2, md: 0 }, 
+        px: { xs: 2, md: 0 },
       }}
     >
       <Box>
@@ -234,7 +307,7 @@ export default function DashboardHomeV2() {
             container
             spacing={2}
             sx={{
-              width: { xs: "100%", md: "70%" }, 
+              width: { xs: "100%", md: "70%" },
               display: "flex",
               justifyContent: "space-around",
             }}
@@ -284,7 +357,7 @@ export default function DashboardHomeV2() {
             container
             spacing={2}
             sx={{
-              width: { xs: "100%", md: "70%" }, 
+              width: { xs: "100%", md: "70%" },
               display: "flex",
               justifyContent: "center",
               flexDirection: "column",
@@ -294,11 +367,16 @@ export default function DashboardHomeV2() {
             <Box
               sx={{
                 display: "flex",
-                gap: { xs: 2, md: "10%" }, 
+                gap: { xs: 2, md: "10%" },
                 flexWrap: { xs: "wrap", md: "nowrap" },
               }}
             >
-              <Grid item xs={12} lg={7} sx={{ width: { xs: "100%", md: "40%" } }}>
+              <Grid
+                item
+                xs={12}
+                lg={7}
+                sx={{ width: { xs: "100%", md: "40%" } }}
+              >
                 <Card
                   elevation={0}
                   sx={{
@@ -343,7 +421,13 @@ export default function DashboardHomeV2() {
                     </Box>
 
                     <Box sx={{ height: { xs: 260, sm: 320 } }}>
-                      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          mb: 1,
+                        }}
+                      >
                         <Select
                           size="small"
                           value={range}
@@ -371,8 +455,18 @@ export default function DashboardHomeV2() {
                           margin={{ top: 10, right: 12, left: -18, bottom: 40 }}
                         >
                           <defs>
-                            <linearGradient id="revFill" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#22d3ee" stopOpacity={0.26} />
+                            <linearGradient
+                              id="revFill"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="#22d3ee"
+                                stopOpacity={0.26}
+                              />
                               <stop
                                 offset="100%"
                                 stopColor="#22d3ee"
@@ -417,7 +511,7 @@ export default function DashboardHomeV2() {
                 xs={12}
                 lg={5}
                 sx={{
-                  width: { xs: "100%", md: "40%" }, 
+                  width: { xs: "100%", md: "40%" },
                   height: "80%",
                   color: "white",
                   display: "flex",
@@ -438,14 +532,62 @@ export default function DashboardHomeV2() {
                         }}
                       >
                         <CardContent sx={{ p: 2.4 }}>
-                          <Typography sx={{ fontWeight: 950, mb: 0.8 }}>
-                            Monthly Target
-                          </Typography>
-                          <Typography sx={{ fontSize: 12, opacity: 0.7, mb: 1.8 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              mb: 0.8,
+                            }}
+                          >
+                            <Typography sx={{ fontWeight: 950 }}>
+                              Monthly Target
+                            </Typography>
+
+                            {!isEditingTarget ? (
+                              <IconButton
+                                onClick={() => setIsEditingTarget(true)}
+                                size="small"
+                                sx={{ color: "rgba(255,255,255,0.8)" }}
+                              >
+                                <EditRoundedIcon fontSize="small" />
+                              </IconButton>
+                            ) : (
+                              <Box sx={{ display: "flex", gap: 1 }}>
+                                <Button
+                                  onClick={() => updateTargetMutation.mutate()}
+                                  disabled={updateTargetMutation.isPending}
+                                >
+                                  {updateTargetMutation.isPending
+                                    ? "Saving..."
+                                    : "Save"}
+                                </Button>
+
+                                <IconButton
+                                  onClick={() => {
+                                    setIsEditingTarget(false);
+                                    setTargetInput(
+                                      String(monthlyTarget?.target ?? "")
+                                    );
+                                  }}
+                                  size="small"
+                                  sx={{ color: "rgba(255,255,255,0.7)" }}
+                                >
+                                  <CloseRoundedIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            )}
+                          </Box>
+
+                          <Typography
+                            sx={{ fontSize: 12, opacity: 0.7, mb: 1.8 }}
+                          >
                             Progress toward this month goal
                           </Typography>
 
-                          <Typography sx={{ fontSize: 30, fontWeight: 950, mb: 1 }}>
+                          <Typography
+                            sx={{ fontSize: 30, fontWeight: 950, mb: 1 }}
+                          >
                             {Math.round((monthlyTarget.progress ?? 0) * 100)}%
                           </Typography>
 
@@ -477,16 +619,63 @@ export default function DashboardHomeV2() {
                               <Typography sx={{ fontSize: 11, opacity: 0.7 }}>
                                 Target
                               </Typography>
-                              <Typography sx={{ fontWeight: 900 }}>
-                                ${Number(monthlyTarget.target ?? 0).toLocaleString()}
-                              </Typography>
+
+                              {!isEditingTarget ? (
+                                <Typography sx={{ fontWeight: 900 }}>
+                                  $
+                                  {Number(
+                                    monthlyTarget.target ?? 0
+                                  ).toLocaleString()}
+                                </Typography>
+                              ) : (
+                                <TextField
+                                  size="small"
+                                  value={targetInput}
+                                  onChange={(e) =>
+                                    setTargetInput(e.target.value)
+                                  }
+                                  placeholder="Enter target"
+                                  type="number"
+                                  inputProps={{ min: 0 }}
+                                  sx={{
+                                    mt: 0.4,
+                                    width: 160,
+                                    "& .MuiOutlinedInput-root": {
+                                      color: "white",
+                                      "& fieldset": {
+                                        borderColor: "rgba(255,255,255,0.25)",
+                                      },
+                                      "&:hover fieldset": {
+                                        borderColor: "rgba(34,211,238,0.45)",
+                                      },
+                                    },
+                                  }}
+                                />
+                              )}
+
+                              {updateTargetMutation.isError && (
+                                <Typography
+                                  sx={{
+                                    mt: 0.6,
+                                    fontSize: 11,
+                                    color: "rgb(239,68,68)",
+                                  }}
+                                >
+                                  {updateTargetMutation.error?.message ||
+                                    "Failed to update target"}
+                                </Typography>
+                              )}
                             </Box>
+
                             <Box>
                               <Typography sx={{ fontSize: 11, opacity: 0.7 }}>
                                 Achieved
                               </Typography>
                               <Typography sx={{ fontWeight: 900 }}>
-                                ${Number(monthlyTarget.achieved ?? 0).toLocaleString()}
+                                $
+                                {Number(
+                                  monthlyTarget.achieved ?? 0
+                                ).toLocaleString()}
                               </Typography>
                             </Box>
                           </Box>
@@ -532,11 +721,14 @@ export default function DashboardHomeV2() {
                                   outerRadius={92}
                                   paddingAngle={2}
                                 >
-                                  {["#7c3aed", "#22d3ee", "#10b981", "#f59e0b"].map(
-                                    (c, i) => (
-                                      <Cell key={i} fill={c} />
-                                    )
-                                  )}
+                                  {[
+                                    "#7c3aed",
+                                    "#22d3ee",
+                                    "#10b981",
+                                    "#f59e0b",
+                                  ].map((c, i) => (
+                                    <Cell key={i} fill={c} />
+                                  ))}
                                 </Pie>
                                 <Legend verticalAlign="bottom" height={36} />
                               </PieChart>
@@ -562,7 +754,9 @@ export default function DashboardHomeV2() {
                               <Typography sx={{ fontSize: 13, opacity: 0.9 }}>
                                 {c.name}
                               </Typography>
-                              <Typography sx={{ fontSize: 13, fontWeight: 900 }}>
+                              <Typography
+                                sx={{ fontSize: 13, fontWeight: 900 }}
+                              >
                                 ${Number(c.value).toLocaleString()}
                               </Typography>
                             </Box>
@@ -574,6 +768,208 @@ export default function DashboardHomeV2() {
                 </Grid>
               </Grid>
             </Box>
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    flex: 1,
+                    minWidth: 320,
+                    color: "#ffff",
+                    borderRadius: 4,
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    bgcolor: "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <CardContent sx={{ p: 2.4 }}>
+                    <Typography sx={{ fontWeight: 950, mb: 0.6 }}>
+                      Top Searches (Found)
+                    </Typography>
+                    <Typography sx={{ fontSize: 12, opacity: 0.7, mb: 1.6 }}>
+                      Most searched queries that returned results
+                    </Typography>
+
+                    {foundLoading ? (
+                      <LinearProgress
+                        sx={{ bgcolor: "rgba(255,255,255,0.06)" }}
+                      />
+                    ) : (
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Query
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Count
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Avg Results
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                            {topFound.map((r) => (
+                              <TableRow key={r.qNorm} hover>
+                                <TableCell
+                                  sx={{ color: "#e5e7eb", fontWeight: 800 }}
+                                >
+                                  {r.examples?.[0] || r.qNorm}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    color: "rgba(229,231,235,0.85)",
+                                    fontWeight: 900,
+                                  }}
+                                >
+                                  {r.count}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    color: "rgba(229,231,235,0.85)",
+                                    fontWeight: 900,
+                                  }}
+                                >
+                                  {r.avgResults ?? "-"}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {topFound.length === 0 && (
+                              <TableRow>
+                                <TableCell
+                                  colSpan={3}
+                                  sx={{ color: "rgba(229,231,235,0.7)" }}
+                                >
+                                  No data yet
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card
+                  elevation={0}
+                  sx={{
+                    flex: 1,
+                    minWidth: 320,
+                    color: "#ffff",
+
+                    borderRadius: 4,
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    bgcolor: "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <CardContent sx={{ p: 2.4 }}>
+                    <Typography sx={{ fontWeight: 950, mb: 0.6 }}>
+                      Top Searches (Not Found)
+                    </Typography>
+                    <Typography sx={{ fontSize: 12, opacity: 0.7, mb: 1.6 }}>
+                      Most searched queries with zero results (opportunities)
+                    </Typography>
+
+                    {notFoundLoading ? (
+                      <LinearProgress
+                        sx={{ bgcolor: "rgba(255,255,255,0.06)" }}
+                      />
+                    ) : (
+                      <TableContainer>
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Query
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Count
+                              </TableCell>
+                              <TableCell
+                                sx={{
+                                  color: "rgba(229,231,235,0.75)",
+                                  fontWeight: 900,
+                                }}
+                              >
+                                Last Seen
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                            {topNotFound.map((r) => (
+                              <TableRow key={r.qNorm} hover>
+                                <TableCell
+                                  sx={{ color: "#e5e7eb", fontWeight: 800 }}
+                                >
+                                  {r.examples?.[0] || r.qNorm}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    color: "rgba(229,231,235,0.85)",
+                                    fontWeight: 900,
+                                  }}
+                                >
+                                  {r.count}
+                                </TableCell>
+                                <TableCell
+                                  sx={{
+                                    color: "rgba(229,231,235,0.75)",
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  {r.lastAt
+                                    ? new Date(r.lastAt).toLocaleDateString()
+                                    : "-"}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                            {topNotFound.length === 0 && (
+                              <TableRow>
+                                <TableCell
+                                  colSpan={3}
+                                  sx={{ color: "rgba(229,231,235,0.7)" }}
+                                >
+                                  No data yet
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </CardContent>
+                </Card>
+              </Box>
+            </Grid>
 
             <Grid item xs={12} sx={{ color: "white" }}>
               <Card
@@ -624,20 +1020,36 @@ export default function DashboardHomeV2() {
 
                           return (
                             <TableRow key={o.id ?? idx} hover>
-                              <TableCell sx={{ fontWeight: 900, color: "#e5e7eb" }}>
+                              <TableCell
+                                sx={{ fontWeight: 900, color: "#e5e7eb" }}
+                              >
                                 {o.id}
                               </TableCell>
 
                               <TableCell>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1.2,
+                                  }}
+                                >
                                   <Avatar
                                     src={o.image || undefined}
-                                    sx={{ width: 34, height: 34, bgcolor: "#7c3aed" }}
+                                    sx={{
+                                      width: 34,
+                                      height: 34,
+                                      bgcolor: "#7c3aed",
+                                    }}
                                   >
-                                    {(o.customer || "U").slice(0, 1).toUpperCase()}
+                                    {(o.customer || "U")
+                                      .slice(0, 1)
+                                      .toUpperCase()}
                                   </Avatar>
 
-                                  <Typography sx={{ fontWeight: 900, color: "#e5e7eb" }}>
+                                  <Typography
+                                    sx={{ fontWeight: 900, color: "#e5e7eb" }}
+                                  >
                                     {o.customer}
                                   </Typography>
                                 </Box>
@@ -652,12 +1064,20 @@ export default function DashboardHomeV2() {
                                 {o.date || "-"}
                               </TableCell>
 
-                              <TableCell sx={{ fontWeight: 950, color: "#e5e7eb" }}>
+                              <TableCell
+                                sx={{ fontWeight: 950, color: "#e5e7eb" }}
+                              >
                                 ${Number(o.amount || 0).toFixed(2)}
                               </TableCell>
 
                               <TableCell>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                  }}
+                                >
                                   <Box
                                     sx={{
                                       width: 9,
@@ -666,7 +1086,9 @@ export default function DashboardHomeV2() {
                                       bgcolor: dot,
                                     }}
                                   />
-                                  <Typography sx={{ fontWeight: 850, color: "#e5e7eb" }}>
+                                  <Typography
+                                    sx={{ fontWeight: 850, color: "#e5e7eb" }}
+                                  >
                                     {o.status}
                                   </Typography>
                                 </Box>
@@ -678,9 +1100,13 @@ export default function DashboardHomeV2() {
                     </Table>
                   </TableContainer>
 
-                  <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", mt: 2 }} />
+                  <Divider
+                    sx={{ borderColor: "rgba(255,255,255,0.08)", mt: 2 }}
+                  />
 
-                  <Box sx={{ display: "flex", gap: 2, mt: 1.6, flexWrap: "wrap" }}>
+                  <Box
+                    sx={{ display: "flex", gap: 2, mt: 1.6, flexWrap: "wrap" }}
+                  >
                     <Typography sx={{ fontSize: 12, opacity: 0.7 }}>
                       Sale status (from recent orders):
                     </Typography>

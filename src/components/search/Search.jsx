@@ -31,7 +31,9 @@ export default function SearchOverlay() {
     const [_key, q] = queryKey;
     if (!q) return { products: [] };
 
-    const { data } = await AxiosInstance.get(`/search?q=${encodeURIComponent(q)}`);
+const { data } = await AxiosInstance.get(
+  `/search?q=${encodeURIComponent(q)}&source=overlay`
+);
 
     const products = (data?.products || []).map((p) => ({
       _id: p._id,
@@ -69,6 +71,18 @@ const goToFilteredProducts = (q) => {
   navigate(`/products-page?search=${encodeURIComponent(cleaned)}&page=1&limit=10`);
 };
 
+const finalizeSearch = async (q) => {
+  const cleaned = (q || "").trim();
+  if (!cleaned) return;
+
+  try {
+    await AxiosInstance.post("/search/log", { q: cleaned, source: "overlay" });
+  } catch {}
+
+  setOpen(false);
+  navigate(`/products-page?search=${encodeURIComponent(cleaned)}&page=1&limit=10`);
+};
+
 
   return (
     <Box sx={{ position: "relative", width: "100%", maxWidth: 520 }}>
@@ -84,12 +98,13 @@ const goToFilteredProducts = (q) => {
         onBlur={() => {
           setTimeout(() => setOpen(false), 150);
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            goToFilteredProducts(query);
-          }
-        }}
+onKeyDown={(e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    finalizeSearch(query);
+  }
+}}
+
         size="small"
         InputProps={{
           startAdornment: (
@@ -131,7 +146,8 @@ const goToFilteredProducts = (q) => {
                   onMouseDown={(e) => e.preventDefault()} 
                   onClick={() => {
                     setQuery(prod.name); 
-                    goToFilteredProducts(prod.name);
+                    finalizeSearch(prod.name);
+
                   }}
                   sx={{ px: 2, py: 1.2 }}
                 >

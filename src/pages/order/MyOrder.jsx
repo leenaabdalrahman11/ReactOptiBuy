@@ -1,5 +1,6 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import AxiosUserInstance from "../../api/AxiosUserInstance";
 import {
   Box,
@@ -8,8 +9,10 @@ import {
   Typography,
   CircularProgress,
   Chip,
+
   Divider,
   Stack,
+  Button
 } from "@mui/material";
 
 export default function MyOrders() {
@@ -28,6 +31,20 @@ export default function MyOrders() {
     queryFn: fetchUserOrders,
     refetchOnWindowFocus: false,
   });
+  const queryClient = useQueryClient();
+
+const confirmReceivedMutation = useMutation({
+  mutationFn: async (orderId) => {
+    const { data } = await AxiosUserInstance.patch(
+      `/order/${orderId}/confirm-received`
+    );
+    return data;
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["userOrders"] });
+  },
+});
+
 
   if (isLoading)
     return (
@@ -175,6 +192,19 @@ export default function MyOrders() {
                     </Typography>
                   )}
                 </Box>
+                {order.status === "deliverd" && (
+  <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+    <Button
+      variant="contained"
+      onClick={() => confirmReceivedMutation.mutate(order._id)}
+      disabled={confirmReceivedMutation.isPending}
+      sx={{ fontWeight: 800, textTransform: "none" }}
+    >
+      {confirmReceivedMutation.isPending ? "..." : "تم الاستلام"}
+    </Button>
+  </Box>
+)}
+
               </Box>
 
               <Divider sx={{ my: 1.5 }} />

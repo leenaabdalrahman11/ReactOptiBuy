@@ -14,6 +14,7 @@ import {
   CardContent,
 } from "@mui/material";
 import ProductReviewsList from "./ProductReviewsList";
+import { Chip } from "@mui/material";
 
 export default function EditProducts() {
   const { id } = useParams();
@@ -262,7 +263,7 @@ export default function EditProducts() {
       dataToSend.append("discount", formData.discount);
       dataToSend.append("stock", formData.stock);
       dataToSend.append("categoryId", formData.categoryId);
-      dataToSend.append("description", formData.description); 
+      dataToSend.append("description", formData.description);
 
       formData.tags.forEach((tag) => dataToSend.append("tags[]", tag));
       if (subCategoryId) dataToSend.append("subCategoryId", subCategoryId);
@@ -460,11 +461,31 @@ export default function EditProducts() {
                 onChange={(e, newValue) =>
                   setFormData((prev) => ({ ...prev, tags: newValue }))
                 }
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option}
+                      {...getTagProps({ index })}
+                      sx={{
+                        backgroundColor: "rgba(255,255,255,0.12)",
+                        color: "#fff",
+                        border: "1px solid rgba(255,255,255,0.35)",
+                        fontWeight: 600,
+                        "& .MuiChip-deleteIcon": {
+                          color: "rgba(255,255,255,0.7)",
+                          "&:hover": {
+                            color: "#fff",
+                          },
+                        },
+                      }}
+                    />
+                  ))
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="Tags"
-                    placeholder="Add tags"
+                    placeholder="Type tag and press Enter"
                     margin="normal"
                     fullWidth
                     sx={fieldSx}
@@ -800,13 +821,13 @@ export default function EditProducts() {
           </CardContent>
         </Card>
 
-        <Box mt={4} sx={{color:"white"}}>
+        <Box mt={4} sx={{ color: "white" }}>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 800 }}>
             Product Reviews
           </Typography>
 
-          <Card sx={{ ...glassCardSx, mt: 1 ,color:"white" }}>
-            <CardContent sx={{ p: { xs: 2, md: 3,color:"white" } }}>
+          <Card sx={{ ...glassCardSx, mt: 1, color: "white" }}>
+            <CardContent sx={{ p: { xs: 2, md: 3, color: "white" } }}>
               {product?._id && <ProductReviewsList productId={product._id} />}
             </CardContent>
           </Card>
@@ -815,3 +836,4 @@ export default function EditProducts() {
     </Box>
   );
 }
+
