@@ -19,7 +19,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import AxiosUserInstance from "../../api/AxiosUserInstance";
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 
