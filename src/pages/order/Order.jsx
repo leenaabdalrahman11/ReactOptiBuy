@@ -68,23 +68,22 @@ const handlePhoneChange = (e) => {
     refetch: refetchCart,
   } = useQuery({
     queryKey: ["cartForOrder", userToken, sessionId],
-    queryFn: async () => {
-      const currentToken = localStorage.getItem("userToken");
-      const currentSessionId =
-        localStorage.getItem("sessionId") || getSessionId();
+queryFn: async () => {
+  const currentToken = localStorage.getItem("userToken");
+  const currentSessionId = localStorage.getItem("sessionId") || getSessionId();
 
-      if (currentToken) {
-        const headers = {
-          Authorization: `Bearer ${currentToken}`,
-          "x-session-id": currentSessionId,
-        };
-        const response = await AxiosUserInstance.get("/cart");
-        return response.data;
-      }
-
-      const response = await AxiosUserInstance.get("/cart");
-      return response.data;
+  const config = {
+    headers: {
+      "x-session-id": currentSessionId,
+      ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}),
     },
+    withCredentials: true,
+  };
+
+  const { data } = await AxiosUserInstance.get("/cart", config);
+  return data;
+},
+
     retry: false,
     enabled: true,
   });
@@ -114,8 +113,18 @@ const handlePhoneChange = (e) => {
       };
 
       try {
-        const response = await AxiosUserInstance.post("/order", payload);
-        return response.data;
+        const config = {
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${currentToken}`,
+    "x-session-id": currentSessionId,
+  },
+  withCredentials: true,
+};
+
+const { data } = await AxiosUserInstance.post("/order", payload, config);
+return data;
+
       } catch (error) {
         console.error("❌ Order API error:");
         console.error("- Status:", error.response?.status);
