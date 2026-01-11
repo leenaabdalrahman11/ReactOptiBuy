@@ -1,0 +1,37 @@
+.title {
+  font-size: 0.95rem;
+}
+
+@media (min-width: 600px) {
+  .title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .title {
+    font-size: 1.1rem;
+  }
+}
+
+.productsSwiper {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.productsSwiper :global(.swiper-slide) {
+  display: flex;
+  justify-content: center;
+}
+
+.productsSwiper :global(.swiper-slide-active) {
+  transform: scale(1.05);
+}
+
+.productsSwiper :global(.swiper-pagination) {
+  bottom: 0px;
+}
+.wrapper {
+  background: #f5f5f553;
+  padding: 40px 0;
+}

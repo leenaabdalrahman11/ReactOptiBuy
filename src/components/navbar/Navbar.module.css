@@ -1,18 +1,134 @@
-.NavList{
-    list-style: none;
-    text-decoration: none;
-    justify-content: space-between;
-    position: fixed;
-    z-index: 999999999999;
+.NavBar {
+  transition: transform 280ms ease, background 200ms ease, box-shadow 200ms ease;
+}
 
+.hideNav {
+  transform: translateY(-110%);
 }
-.NavMenu{
-    width: 20%;
-    display: flex;
-    justify-content: space-around;
+
+.scrolled {
 }
-.NavAuth{
-    width: 20%;
+
+.toolbar {
+  min-height: 72px;
+  display: flex;
+  gap: 12px;
+  padding: 0 14px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+.MenuIcon {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.brand {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  font-size: 18px;
+  display: none;
+}
+
+.center {
+  flex: 1 1 auto;
+  display: none;
+  justify-content: center;
+}
+
+.NavMenu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.10);
+  transform: translateY(-1px);
+}
+
+.searchWrap {
+  flex: 1 1 auto;
+  max-width: 520px;
+  min-width: 140px;
+}
+
+.right {
+  flex: 0 0 auto;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.authBtns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ghostBtn {
+  color: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 999px !important;
+  padding: 8px 14px !important;
+  text-transform: none !important;
+  font-weight: 800 !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.ghostBtn:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+}
+
+.primaryBtn {
+  color: #0b1220 !important;
+  border-radius: 999px !important;
+  padding: 8px 14px !important;
+  text-transform: none !important;
+  font-weight: 900 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+.primaryBtn:hover {
+  background: rgba(255, 255, 255, 1) !important;
+}
+
+@media (min-width: 600px) {
+  .brand {
+    display: inline-block;
+  }
+  .center {
     display: flex;
-    justify-content: space-around;
+  }
+  .right {
+    display: flex;
+  }
+  .searchWrap {
+    flex: 0 1 360px;
+  }
+}
+
+@media (min-width: 900px) {
+  .searchWrap {
+    flex-basis: 420px;
+  }
 }

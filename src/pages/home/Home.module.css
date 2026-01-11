@@ -1,8 +1,46 @@
 .bg{
     background-color: red;
 }
-.HeaderImage{
-    background-image: url(./HomeImage.png);
-    background-size: cover;
-    height: 35vh;
+.welcomeText{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    color: var(--main-color);
+    align-content: center;
+    text-align: center;
+    flex-wrap: wrap;
 }
+.welcomComponent{
+    width: 40%;
+    margin-top: 8%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    border-radius: 20px;
+    position: relative;
+    top: 5%;
+}
+.HeaderImage{
+    
+    background-image: url(./HomePage.png);
+    background-size:cover;
+    background-repeat: no-repeat;
+    background-position:right;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+
+    flex-direction: column;
+    align-content: center;
+    width: 100%;
+    height: 80vh;
+}
+@media (max-width: 600px) {
+  .HeaderImage {
+    min-height: 60vh;
+    background-position: center;
+    padding: 40px 12px;
+  }}

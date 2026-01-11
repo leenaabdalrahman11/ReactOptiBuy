@@ -1,0 +1,170 @@
+.card {
+  border-radius: 18px;
+  border: 1px solid rgba(20, 20, 20, 0.08);
+  background: rgb(245 245 242) !important;
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease,
+    border-color 160ms ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.09);
+  border-color: rgba(20, 20, 20, 0.14);
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.mediaWrap {
+  position: relative;
+  overflow: hidden;
+  background: #f7f7f8;
+}
+
+.media {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 220ms ease;
+}
+
+.card:hover .media {
+  transform: scale(1.03);
+}
+
+.discountBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(17, 17, 17, 0.92);
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+
+.header {
+  padding: 14px 14px 6px 14px;
+}
+
+.productName {
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.subheader {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.moreBtn {
+  opacity: 0.7;
+}
+
+.moreBtn:hover {
+  opacity: 1;
+}
+
+.content {
+  padding: 10px 14px 14px 14px;
+}
+
+.cardActions {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.priceBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oldPrice {
+  font-size: 12px;
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reviewsBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 110px;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ratingStar {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.ratingStarFilled {
+  color: #111;
+}
+
+.ratingStarEmpty {
+  color: rgba(17, 17, 17, 0.2);
+}
+
+.avgRatingValue {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.metaText {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.errorText {
+  font-size: 12px;
+  color: #d32f2f;
+}
+
+.cartBtn {
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  min-width: 84px !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.cartBtn:hover {
+  background: #000 !important;
+}

@@ -1,0 +1,274 @@
+.wrapper {
+  padding: 24px;
+  max-width: 1200px;
+  margin-top: 50px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.subtitle {
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.cardWrap {
+  width: 100%;
+}
+
+.paginationWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.paginationWrap :global(.MuiPagination-ul) {
+  gap: 6px;
+}
+
+.paginationWrap :global(.MuiPaginationItem-root) {
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+
+.card {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  background: #ffffff57 !important;
+  margin-top: 4%;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12) !important;
+}
+
+.card :global(a) {
+  text-decoration: none;
+  color: inherit;
+}
+
+.headerTitleBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.productName {
+  font-weight: 700 !important;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discountBadge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 60, 60, 0.12);
+  color: #d32f2f;
+  border: 1px solid rgba(211, 47, 47, 0.25);
+}
+
+.card :global(.MuiCardMedia-root) {
+  object-fit: cover;
+}
+
+.cardActions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+  padding: 4px 12px 10px 12px !important;
+}
+
+.oldPrice {
+  text-decoration: line-through;
+  opacity: 0.55;
+  margin-right: 8px;
+}
+
+.newPrice {
+  font-weight: 800;
+}
+
+.reviewsBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ratingStar {
+  font-size: 14px;
+  margin-right: 1px;
+}
+
+.ratingStarFilled {
+  color: #f5b301;
+}
+
+.ratingStarEmpty {
+  color: rgba(0, 0, 0, 0.18);
+}
+
+.avgRatingValue {
+  margin-left: 6px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.reviewsBox :global(.MuiButton-root) {
+  min-width: 40px !important;
+  padding: 6px 10px !important;
+  border-radius: 12px !important;
+  font-weight: 800 !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.reviewsBox :global(.MuiButton-root:hover) {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+.page {
+  min-height: 100vh;
+  background: #ffffff00;
+  padding: 28px 16px 56px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero {
+  text-align: center;
+  padding: 8px 0 18px;
+}
+
+.kicker {
+  font-size: 14px;
+  color: #8b8b8b;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  color: #111827;
+  margin-bottom: 6px !important;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 14px !important;
+}
+
+.tabsWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 22px;
+}
+
+.tabs :global(.MuiTabs-flexContainer) {
+  gap: 18px;
+  justify-content: center;
+}
+
+.tab {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  color: #6b7280 !important;
+  min-height: 40px !important;
+  padding: 8px 10px !important;
+}
+
+.tabs :global(.Mui-selected) {
+  color: #111827 !important;
+}
+
+.tabIndicator {
+  height: 2px !important;
+  border-radius: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+}
+
+.cardOuter {
+  grid-column: span 12;
+}
+@media (max-width: 600px) {
+  .hero{
+    background-color: #d32f2f00;
+    margin-top: 20px;
+  }
+
+}
+
+@media (min-width: 600px) {
+
+  .cardOuter {
+    grid-column: span 6;
+  }
+}
+
+@media (min-width: 900px) {
+  .cardOuter {
+    grid-column: span 3;
+  }
+}
+
+.paginationWrap {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+
+.divider {
+  width: 100%;
+  max-width: 920px;
+  opacity: 0.6;
+}
