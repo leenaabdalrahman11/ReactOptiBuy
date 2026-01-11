@@ -73,9 +73,11 @@ export default function Register() {
         navigate("/verify-email", { replace: true });
       }
     } catch (err) {
-      const message = err.response?.data?.message || "Something went wrong";
+      const message =
+        err?.code === "ECONNABORTED"
+          ? "Server is taking too long. Try again."
+          : err.response?.data?.message || "Server error. Try again.";
       setServerError(message);
-      console.log(err.response?.status, err.response?.data);
     } finally {
       setIsLoading(false);
     }
@@ -102,9 +104,12 @@ export default function Register() {
         <Box className={styles.grid}>
           <Box className={styles.left}>
             <Typography className={styles.brand}>OptiBuy</Typography>
-            <Typography className={styles.title}>Create your account </Typography>
+            <Typography className={styles.title}>
+              Create your account{" "}
+            </Typography>
             <Typography className={styles.subtitle}>
-              Join us to save your favorites, manage orders, and enjoy a smoother checkout.
+              Join us to save your favorites, manage orders, and enjoy a
+              smoother checkout.
             </Typography>
 
             <Box className={styles.pills}>
@@ -185,7 +190,10 @@ export default function Register() {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword((v) => !v)} edge="end">
+                      <IconButton
+                        onClick={() => setShowPassword((v) => !v)}
+                        edge="end"
+                      >
                         {showPassword ? (
                           <VisibilityOffOutlinedIcon fontSize="small" />
                         ) : (
@@ -213,7 +221,10 @@ export default function Register() {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setShowConfirm((v) => !v)} edge="end">
+                      <IconButton
+                        onClick={() => setShowConfirm((v) => !v)}
+                        edge="end"
+                      >
                         {showConfirm ? (
                           <VisibilityOffOutlinedIcon fontSize="small" />
                         ) : (

@@ -25,7 +25,7 @@ export default function Categories() {
   const [categories, setCategories] = useState([]);
   const fetchCategories = async () => {
     const response = await AxiosInstance.get("categories/active");
-    return response;
+    return response.data;
   };
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
@@ -34,7 +34,7 @@ export default function Categories() {
   });
   if (isError) return <p>error is {error.message}</p>;
   if (isLoading) return <CircularProgress />;
-  console.log(data);
+  console.log("categories:", data);
 
   return (
     <Box className={styles.wrapper}>
@@ -53,7 +53,7 @@ export default function Categories() {
           }}
           className={styles.categoriesSwiper}
         >
-          {data.data.categories.map((cat, index) => (
+          {(data?.categories || []).map((cat, index) => (
             <SwiperSlide key={cat._id} virtualIndex={index}>
               <Card elevation={0} className={styles.categoryCard}>
                 <Link
