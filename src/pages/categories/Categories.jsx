@@ -19,7 +19,7 @@ import "swiper/css/virtual";
 import { Link } from "react-router";
 import AxiosInstance from "../../api/AxiosInstance";
 
-import styles from "./Categories.module.css";
+import styles from "./categories.module.css";
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
