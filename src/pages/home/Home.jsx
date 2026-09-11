@@ -32,14 +32,13 @@ export default function Home() {
   return (
     <>
       <div className={style.HeaderImage}>
-        <Box
-          className={style.welcomComponent}
-          sx={{
-            width: { xs: "92%", sm: "70%", md: "50%", lg: "40%" },
-            px: { xs: 2, sm: 3 },
-            py: { xs: 2.5, sm: 3 },
-          }}
-        >
+<Box
+  className={style.welcomComponent}
+  sx={{
+    px: { xs: 2.5, sm: 4 },
+    py: { xs: 3, sm: 4 },
+  }}
+>
           <Typography
             className={style.welcomeText}
             variant="h4"
@@ -47,7 +46,7 @@ export default function Home() {
             sx={{
               fontSize: { xs: "1.6rem", sm: "2rem", md: "2.4rem" },
               lineHeight: 1.15,
-              color:"white"
+              
             }}
           >
             {userName
@@ -60,9 +59,9 @@ export default function Home() {
             sx={{
               mt: 1,
               opacity: 0.88,
-              color: "white",
               fontSize: { xs: "1rem", sm: "1.15rem", md: "1.25rem" },
             }}
+            
           >
             {t("home.subtitle")}
           </Typography>

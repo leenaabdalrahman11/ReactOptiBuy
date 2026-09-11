@@ -1,37 +1,140 @@
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50px;
+  background:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(207, 26, 17, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(255, 190, 160, 0.14),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #fffafa 0%, #ffffff 100%);
+}
+
 .title {
-  font-size: 0.95rem;
+  position: relative;
+  width: fit-content;
+  margin: 0 auto 42px !important;
+  padding-bottom: 10px;
+  color: #cf1a11;
+  font-size: 1.45rem !important;
+  font-weight: 800 !important;
+  text-align: center;
+  letter-spacing: -0.3px;
 }
 
-@media (min-width: 600px) {
-  .title {
-    font-size: 1.1rem;
-  }
+.title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+
+  width: 50px;
+  height: 2px;
+  border-radius: 20px;
+
+  background: linear-gradient(90deg, #cf1a11, #ff786c);
+  transform: translateX(-50%);
 }
 
-@media (min-width: 900px) {
-  .title {
-    font-size: 1.1rem;
-  }
+.swiperContainer {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 10px 0;
 }
 
 .productsSwiper {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  overflow: visible;
+  padding: 35px 10px 60px !important;
 }
 
 .productsSwiper :global(.swiper-slide) {
   display: flex;
   justify-content: center;
+  height: auto;
+
+  opacity: 0.65;
+  transform: scale(0.92);
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease,
+    filter 0.4s ease;
+  filter: saturate(0.8);
 }
 
 .productsSwiper :global(.swiper-slide-active) {
-  transform: scale(1.05);
+  z-index: 2;
+  opacity: 1;
+  transform: scale(1.04);
+  filter: saturate(1);
 }
 
 .productsSwiper :global(.swiper-pagination) {
-  bottom: 0px;
+  bottom: 8px !important;
 }
-.wrapper {
-  background: #f5f5f553;
-  padding: 40px 0;
+
+.productsSwiper :global(.swiper-pagination-bullet) {
+  width: 9px;
+  height: 9px;
+  margin: 0 5px !important;
+
+  background: #cf1a11;
+  opacity: 0.25;
+  transition: all 0.3s ease;
+}
+
+.productsSwiper :global(.swiper-pagination-bullet-active) {
+  width: 26px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #cf1a11, #ff675c);
+  opacity: 1;
+}
+
+@media (min-width: 600px) {
+  .wrapper {
+    padding: 50px 10px;
+  }
+
+  .title {
+    font-size: 1.8rem !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .wrapper {
+    padding: 50px 10px;
+  }
+
+  .title {
+    font-size: 2.1rem !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .wrapper {
+    padding: 55px 12px;
+  }
+
+  .title {
+    margin-bottom: 25px !important;
+    font-size: 1.4rem !important;
+  }
+
+  .productsSwiper {
+    padding: 20px 5px 50px !important;
+  }
+
+  .productsSwiper :global(.swiper-slide) {
+    opacity: 1;
+    transform: scale(0.96);
+  }
+
+  .productsSwiper :global(.swiper-slide-active) {
+    transform: scale(1);
+  }
 }

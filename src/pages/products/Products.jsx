@@ -46,7 +46,7 @@ export default function Products() {
         } catch {
           return { id, avg: 0, count: 0 };
         }
-      })
+      }),
     );
 
     return results.reduce((acc, cur) => {
@@ -67,7 +67,8 @@ export default function Products() {
   });
 
   if (isLoading) return <CircularProgress />;
-  if (isError) return <p>{t("products.errorWithMessage", { message: error.message })}</p>;
+  if (isError)
+    return <p>{t("products.errorWithMessage", { message: error.message })}</p>;
 
   const filteredProducts = products.filter((p) => {
     const id = p._id || p.id;
@@ -79,10 +80,14 @@ export default function Products() {
 
   return (
     <Box className={styles.wrapper}>
-      <Typography variant="h5" component={"h2"} className={styles.title}>
+      <Typography
+        variant="h5"
+        component="h2"
+        sx={{ color: "#cf1a11" }}
+        className={styles.title}
+      >
         {t("products.bestSelling")}
       </Typography>
-
       {isRatingsLoading && (
         <Typography variant="body2" sx={{ textAlign: "center", mt: 1 }}>
           {t("products.loadingRatings")}
@@ -90,7 +95,11 @@ export default function Products() {
       )}
 
       {isRatingsError && (
-        <Typography variant="body2" color="error" sx={{ textAlign: "center", mt: 1 }}>
+        <Typography
+          variant="body2"
+          color="error"
+          sx={{ textAlign: "center", mt: 1 }}
+        >
           {t("products.errorLoadingRatings")}
         </Typography>
       )}
@@ -132,6 +141,7 @@ export default function Products() {
               slideShadows: false,
             }}
             pagination
+            centeredSlides={true}
             modules={[EffectCoverflow, Pagination]}
             className={`mySwiper ${styles.productsSwiper}`}
             breakpoints={{

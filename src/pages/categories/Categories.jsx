@@ -64,8 +64,17 @@ export default function Categories() {
                     className={styles.categoryAvatar}
                     alt={cat?.name || "category"}
                     src={cat?.image?.secure_url || ""}
+                      sx={{
+    width: 70,
+    height: 70,
+  }}
                   />
-                  <Typography variant="body1">{cat.name}</Typography>
+                  <Typography
+  variant="body1"
+  sx={{ fontSize: "1.1rem", fontWeight: 500 }}
+>
+  {cat.name}
+</Typography>
                 </Link>
               </Card>
             </SwiperSlide>

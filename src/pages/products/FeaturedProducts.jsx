@@ -62,15 +62,14 @@ export default function FeaturedProducts() {
   if (isError) return <Typography>Error loading featured products</Typography>;
 
   return (
-    <>
-      <Typography
-        variant="h5"
-        component={"h2"}
-        className={styles.title}
-        sx={{ mt: 5 }}
-      >
-        {title}
-      </Typography>
+    <Box className={styles.wrapper}>
+<Typography
+  variant="h5"
+  component="h2"
+  className={styles.title}
+>
+  {title}
+</Typography>
       <Swiper
         modules={[Grid, Pagination, Autoplay]}
         pagination={{ clickable: true }}
@@ -96,79 +95,81 @@ export default function FeaturedProducts() {
         {products.map((product) => (
           <SwiperSlide key={product._id} className={styles.slide}>
             <Card
-              onClick={() => navigate(`/product-details/${product._id}`)}
-              sx={{
-                width: 250,
-                height: 300,
-                display: "flex",
-                flexDirection: "column",
-                borderRadius: 4,
-                overflow: "hidden",
-                marginBottom: "20%",
-                backgroundColor: "#F5F5F2",
-                border: "1px solid #D6D6D2",
-                cursor: "pointer",
-                transition: "0.25s",
-                "&:hover": {
-                  transform: "translateY(-6px)",
-                  boxShadow: "0 12px 30px rgba(0,0,0,0.18)",
-                  borderColor: "#D97A2B",
-                },
-              }}
-            >
+  onClick={() => navigate(`/product-details/${product._id}`)}
+  sx={{
+    width: "100%",
+    maxWidth: 280,
+    height: 350,
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "24px",
+    overflow: "hidden",
+    backgroundColor: "#ffffff",
+    border: "1px solid rgba(207, 26, 17, 0.1)",
+    cursor: "pointer",
+    boxShadow: "0 8px 30px rgba(80, 20, 15, 0.08)",
+    transition: "transform 0.35s ease, box-shadow 0.35s ease",
+    "&:hover": {
+      transform: "translateY(-10px)",
+      boxShadow: "0 20px 45px rgba(207, 26, 17, 0.16)",
+    },
+    "&:hover img": {
+      transform: "scale(1.06)",
+    },
+  }}
+>
               <CardMedia
-                component="img"
-                sx={{
-                  flex: "0 0 70%",
-                  width: "100%",
-                  height: "70%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-                image={product.mainImage?.secure_url}
-                alt={product.name}
-              />
+  component="img"
+  sx={{
+    width: "100%",
+    height: 245,
+    objectFit: "cover",
+    display: "block",
+    transition: "transform 0.5s ease",
+  }}
+  image={product.mainImage?.secure_url}
+  alt={product.name}
+/>
 
               <CardContent
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  p: 1.5,
-                  background:
-                    "linear-gradient(180deg, rgba(245,245,242,0.92) 0%, #F5F5F2 40%)",
-                }}
-              >
+  sx={{
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    p: 2,
+  }}
+>
                 <Typography
-                  sx={{
-                    fontWeight: 700,
-                    color: "#1E1E1E",
-                    fontSize: 14,
-                    lineHeight: 1.2,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
-                  {product.name}
-                </Typography>
+  sx={{
+    fontWeight: 700,
+    color: "#2b2020",
+    fontSize: "1rem",
+    lineHeight: 1.4,
+    display: "-webkit-box",
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  }}
+>
+  {product.name}
+</Typography>
 
                 <Typography
-                  sx={{
-                    mt: 0.75,
-                    fontWeight: 800,
-                    color: "#D97A2B",
-                  }}
-                >
-                  ${product.priceAfterDiscount ?? product.price}
-                </Typography>
+  sx={{
+    mt: 1,
+    fontWeight: 800,
+    color: "#cf1a11",
+    fontSize: "1.05rem",
+  }}
+>
+  ${product.priceAfterDiscount ?? product.price}
+</Typography>
               </CardContent>
             </Card>
           </SwiperSlide>
         ))}
       </Swiper>
-    </>
+    </Box>
   );
 }

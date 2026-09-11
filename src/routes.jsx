@@ -35,7 +35,7 @@ import EditUser from "./pages/dashboard/EditUser";
 import FeaturedProducts from "./pages/products/FeaturedProducts.jsx";
 import DashboardHomeTag from "./pages/dashboard/DashboardHomeTag.jsx";
 import UserOrder from "./pages/order/UserOreder.jsx";
-import subCategories from "./pages/subCategories/SubCategories.jsx";
+import SubCategories from "./pages/subCategories/SubCategories.jsx";
 import EditPromoSection from "./pages/dashboard/EditPromoSection.jsx";
 import ProductsPage from "./pages/products/ProductsPage.jsx";
 import EditExperienceHighlight from "./pages/dashboard/EditExperienceHighlight.jsx";
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
       { path: "reset-password", element: <ResetPassword /> },
       { path: "categories", element: <Categories /> },
       { path: "category-details/:id", element: <CategoriesDetails /> },
-      { path: "subcategory-details/:id", element: <subCategories /> },
+      { path: "subcategory-details/:id", element: <SubCategories /> },
       { path: "product-details/:id", element: <ProductsDetails /> },
     ],
   },

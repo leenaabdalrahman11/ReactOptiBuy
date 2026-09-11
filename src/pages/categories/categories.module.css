@@ -4,6 +4,7 @@
 
 .title {
   font-size: 0.95rem;
+  color: "#cf1a11",
 }
 .mySwiper {
   --swiper-pagination-bullet-size: 7px;
@@ -108,8 +109,8 @@
 }
 
 .categoryAvatar {
-  width: 55px;
-  height: 55px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto 8px auto;
 }
 

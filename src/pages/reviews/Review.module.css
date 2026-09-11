@@ -1,14 +1,14 @@
 .wrap{
   width: min(1120px, 92%);
-  margin: 80px auto;
+  margin: 40px auto;
   text-align: center;
 }
 
 .kicker{
-  font-size: 12px;
+  font-size: 1.45rem !important;
   letter-spacing: 3px;
   font-weight: 800;
-  color: #f59e0b;
+  color:#cf1a11;
   margin-bottom: 10px;
 }
 

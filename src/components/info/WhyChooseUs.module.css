@@ -8,11 +8,14 @@
 .header {
   max-width: 680px;
   margin: 0 auto 36px;
+
 }
 
 .title {
   font-weight: 800;
   margin: 0 0 10px;
+  color:#cf1a11;
+
 }
 
 .subtitle {
@@ -51,6 +54,8 @@
 .cardTitle {
   font-weight: 800;
   margin: 0 0 10px;
+  color:#cf1a11;
+
 }
 
 .cardText {

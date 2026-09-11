@@ -21,8 +21,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function AdminProducts() {
   const navigate = useNavigate();
-const [search, setSearch] = useState("");
-
+  const [search, setSearch] = useState("");
 
   const fetchProducts = async () => {
     const { data } = await AxiosUserInstance.get("/products");
@@ -33,13 +32,13 @@ const [search, setSearch] = useState("");
     queryKey: ["admin-products"],
     queryFn: fetchProducts,
   });
-const filteredProducts = useMemo(() => {
-  if (!data) return [];
+  const filteredProducts = useMemo(() => {
+    if (!data) return [];
 
-  return data.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
-}, [data, search]);
+    return data.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()),
+    );
+  }, [data, search]);
   const handleEdit = (id) => {
     navigate(`/dashboard/products/update/${id}`);
   };
@@ -52,11 +51,11 @@ const filteredProducts = useMemo(() => {
       } catch (error) {
         console.error(
           "Failed to delete product:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         alert(
           "Failed to delete product: " +
-            (error.response?.data?.message || error.message)
+            (error.response?.data?.message || error.message),
         );
       }
     }
@@ -145,58 +144,55 @@ const filteredProducts = useMemo(() => {
         },
       }}
     >
-      
       <Box sx={{ position: "relative", zIndex: 1, maxWidth: 1200, mx: "auto" }}>
-<Box
-  sx={{
-    mb: 2,
-    p: 2,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 2,
-    flexWrap: "wrap",
-    borderRadius: 2,
-    background: "rgba(2,6,23,0.35)",
-    border: "1px solid rgba(148,163,184,0.12)",
-    backdropFilter: "blur(8px)",
-  }}
->
-  <TextField
-    size="small"
-    placeholder="Search product..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    sx={{
-      minWidth: 260,
-      "& .MuiInputBase-root": {
-        color: "white",
-        background: "rgba(15,23,42,0.6)",
-        borderRadius: 2,
-      },
-    }}
-  />
+        <Box
+          sx={{
+            mb: 2,
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: "wrap",
+            borderRadius: 2,
+            background: "rgba(2,6,23,0.35)",
+            border: "1px solid rgba(148,163,184,0.12)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          <TextField
+            size="small"
+            placeholder="Search product..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{
+              minWidth: 260,
+              "& .MuiInputBase-root": {
+                color: "white",
+                background: "rgba(15,23,42,0.6)",
+                borderRadius: 2,
+              },
+            }}
+          />
 
-  <Box sx={{ display: "flex", gap: 1 }}>
-    <Button
-      variant="outlined"
-      onClick={() => setSearch("")}
-      sx={outlineBtnSx}
-    >
-      Clear
-    </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setSearch("")}
+              sx={outlineBtnSx}
+            >
+              Clear
+            </Button>
 
-    <Button
-      variant="contained"
-      onClick={() => navigate("/dashboard/products/create")}
-      sx={primaryBtnSx}
-    >
-      Create Product
-    </Button>
-  </Box>
-</Box>
-
-
+            <Button
+              variant="contained"
+              onClick={() => navigate("/dashboard/products/create")}
+              sx={primaryBtnSx}
+            >
+              Create Product
+            </Button>
+          </Box>
+        </Box>
 
         {isLoading && (
           <Box sx={{ display: "grid", placeItems: "center", py: 8 }}>
@@ -235,15 +231,18 @@ const filteredProducts = useMemo(() => {
 
                   <TableBody>
                     {filteredProducts.map((product) => (
-
                       <TableRow key={product._id}>
                         <TableCell>{product.name}</TableCell>
                         <TableCell>{product.CategoryId?.name}</TableCell>
-                        <TableCell>{product.subCategoryId?.name || "-"}</TableCell>
+                        <TableCell>
+                          {product.subCategoryId?.name || "-"}
+                        </TableCell>
                         <TableCell>{product.priceAfterDiscount} ₪</TableCell>
                         <TableCell>{product.stock}</TableCell>
                         <TableCell>
-                          {Array.isArray(product.tags) ? product.tags.join(", ") : ""}
+                          {Array.isArray(product.tags)
+                            ? product.tags.join(", ")
+                            : ""}
                         </TableCell>
 
                         <TableCell>

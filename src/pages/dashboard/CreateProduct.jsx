@@ -342,9 +342,6 @@ export default function CreateProduct() {
               )}
 
               <Box mt={2} color={"white"}>
-                <Typography fontSize={13} mb={1}>
-                  Main Image
-                </Typography>
                 <Box mt={2} color={"white"}>
                   <Typography fontSize={13} mb={1}>
                     Main Image
