@@ -40,19 +40,27 @@ export default function Categories() {
     <Box className={styles.wrapper}>
       <Box className={styles.swiperContainer}>
         <Swiper
-          modules={[Virtual, Autoplay]}
-          loop={true}
-          autoplay={{ delay: 2500, disableOnInteraction: false }}
-          spaceBetween={16}
-          slidesPerView={4}
-          breakpoints={{
-            320: { slidesPerView: 2, spaceBetween: 10 },
-            600: { slidesPerView: 3, spaceBetween: 15 },
-            900: { slidesPerView: 5, spaceBetween: 18 },
-            1200: { slidesPerView: 5, spaceBetween: 20 },
-          }}
-          className={styles.categoriesSwiper}
-        >
+  modules={[Virtual, Autoplay]}
+  loop={true}
+  autoplay={{ delay: 2500, disableOnInteraction: false }}
+  slidesPerView={3}
+  spaceBetween={8}
+  breakpoints={{
+    600: {
+      slidesPerView: 4,
+      spaceBetween: 12,
+    },
+    900: {
+      slidesPerView: 5,
+      spaceBetween: 18,
+    },
+    1200: {
+      slidesPerView: 5,
+      spaceBetween: 20,
+    },
+  }}
+  className={styles.categoriesSwiper}
+>
           {(data?.categories || []).map((cat, index) => (
             <SwiperSlide key={cat._id} virtualIndex={index}>
               <Card elevation={0} className={styles.categoryCard}>
@@ -61,17 +69,24 @@ export default function Categories() {
                   className={styles.categoryLink}
                 >
                   <Avatar
-                    className={styles.categoryAvatar}
-                    alt={cat?.name || "category"}
-                    src={cat?.image?.secure_url || ""}
-                      sx={{
-    width: 70,
-    height: 70,
+  className={styles.categoryAvatar}
+  alt={cat?.name || "category"}
+  src={cat?.image?.secure_url || ""}
+  sx={{
+    width: { xs: 55, sm: 70, md: 80 },
+    height: { xs: 55, sm: 70, md: 80 },
   }}
-                  />
-                  <Typography
+/>
+                 <Typography
   variant="body1"
-  sx={{ fontSize: "1.1rem", fontWeight: 500 }}
+  sx={{
+    fontSize: {
+      xs: "0.75rem",
+      sm: "0.95rem",
+      md: "1.1rem",
+    },
+    fontWeight: 500,
+  }}
 >
   {cat.name}
 </Typography>
